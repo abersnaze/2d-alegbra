@@ -1,0 +1,32 @@
+{
+  "name": "2d-algebra",
+  "version": "0.1.0",
+  "description": "Library for building expressions and computing derivatives",
+  "repository": "github:abersnaze/2d-algebra",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest",
+    "watch": "jest --watch",
+    "clean": "rm -rf ./dist",
+    "lint": "tslint -p tsconfig.json",
+    "compile": "tsc",
+    "prepare": "npm run clean && npm run lint && npm run test && npm run compile"
+  },
+  "keywords": ["math", "algebra", "expression", "derivative"],
+  "author": "George Campbell",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.2"
+  },
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "dependencies": {},
+  "jest": {
+    "preset": "ts-jest",
+    "collectCoverage": true
+  }
+}
