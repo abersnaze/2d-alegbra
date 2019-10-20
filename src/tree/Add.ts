@@ -1,5 +1,5 @@
-import { Assignments } from "..";
-import { add, INode } from "./INode";
+import { Assignments } from "../Expression";
+import { add, INode } from "./index";
 
 export class Add implements INode {
   constructor(readonly a: INode, readonly b: INode) { }

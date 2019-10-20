@@ -16,16 +16,16 @@ To use this library
 
 `npm install 2d-algebra`
 
-Then in your code you can import and use the `Expression.of(...)` static method to fluently build expressions.
+Then in your code you can import and use the `expression(...)` function to fluently build expressions.
 
 ```js
-import { Expression } from "2d-algebra";
+import expression from "2d-algebra";
 
 const m = 3; // slope
 const b = 4; // point
 const x = Symbol("x");
 const y = Symbol(); // naming your symbols is optional
-const line = Expression.of(y).eq(m).times(x).plus(b);
+const line = expression(m).times(x).plus(b).eq(y);
 ```
 
 ## API
@@ -33,7 +33,7 @@ const line = Expression.of(y).eq(m).times(x).plus(b);
 Creating a new `Expression` is a easy as starting it off with the first `symbol` or `number`.
 
 ```
-const expression = Expression.of(1);
+const one = expression(1).eval(new Map());
 ```
 
 From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number` or `Expression`.
@@ -69,9 +69,8 @@ const x = Symbol();
 const y = Symbol();
 
 // EXAMPLE OF HOW TO DO IT WRONG
-const circle = Expression
-  .of(x)      //   x
-  .squared()  //   x^2
+const circle = expression(x)
+  .squared()  //   x^2 
   .plus(y)    //   x^2 + y
   .squared()  //  (x^2 + y)^2
   .eq(r)      //  (x^2 + y)^2 - r)^2
@@ -83,8 +82,7 @@ Would produce `((x^2 + y)^2 - r)^2)^2`. When I would have expected `(x^2 + y^2 -
 The corrected code now looks like:
 
 ```js
-const circle = Expression
-  .of(x)      //  x
+const circle = expression(x)
   .squared()  //  x^2
   .push(y)    //  x^2 | y   <---- y here is separate from x^2
   .squared()  //  x^2 | y^2 <---- now that y is squared on its own

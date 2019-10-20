@@ -1,5 +1,5 @@
-import { Assignments } from "..";
-import { INode, mult, pow, value } from "./INode";
+import { Assignments } from "../Expression";
+import { INode, mult, pow, value } from "./index";
 
 export class Pow implements INode {
   constructor(readonly a: INode, readonly b: number) { }

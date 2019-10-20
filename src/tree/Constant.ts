@@ -1,5 +1,5 @@
-import { Assignments } from "..";
-import { INode, value } from "./INode";
+import { Assignments } from "../Expression";
+import { INode, value } from "./index";
 
 export class Constant implements INode {
   constructor(readonly n: number) { }

@@ -1,4 +1,4 @@
-import { add, degreeComparator, mult, pow, variable } from "../src/tree/INode";
+import { add, degreeComparator, mult, pow, variable } from "../src/tree";
 
 test("cmp unnamed", () => {
     const [a, b, c] = [variable(), variable(), variable()];

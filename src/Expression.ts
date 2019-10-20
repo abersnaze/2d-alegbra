@@ -1,14 +1,13 @@
 import { ExpressionStack } from "./ExpressionStack";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, value, variable } from "./tree/INode";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode } from "./tree/index";
 
-export type Term = number | symbol | Expression;
+export function expression(x: number | symbol): Expression {
+  return new Expression(toNode(x));
+}
+
 export type Assignments = Map<symbol, number>;
 
 export class Expression {
-  public static of(a: symbol | number): Expression {
-    return new Expression(toNode(a));
-  }
-
   constructor(readonly a: INode) { }
 
   public plus(b: Term): Expression {
@@ -63,19 +62,7 @@ export class Expression {
     return new Expression(this.a.derivative(withRespectTo));
   }
 
-  public eval(assign: Map<symbol, number>): number {
+  public eval(assign: Assignments): number {
     return this.a.eval(assign);
-  }
-}
-
-export function toNode(x: Term): INode {
-  if (typeof x === "symbol") {
-    return variable(x);
-  } else if (typeof x === "number") {
-    return value(x);
-  } else if (x instanceof Expression) {
-    return x.a;
-  } else {
-    throw new Error("term is not number, symbole, or Expression");
   }
 }

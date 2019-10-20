@@ -1,5 +1,5 @@
-import { Assignments } from "..";
-import { INode, mult, sin, value } from "./INode";
+import { Assignments } from "../Expression";
+import { INode, mult, sin, value } from "./index";
 
 export class Cosine implements INode {
   constructor(readonly a: INode) { }

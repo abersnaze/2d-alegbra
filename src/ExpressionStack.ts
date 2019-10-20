@@ -1,66 +1,52 @@
-import { Expression, Term, toNode } from "./Expression";
-import { add, cos, eq, INode, mult, pow, sin, sub, tan } from "./tree/INode";
+import { Expression } from "./Expression";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, toNode } from "./tree/index";
+
+type Term = number | symbol | Expression;
+
+function stack<N extends ExpressionStack<any> | Expression>(op, parent: N, b: INode, c?: Term) {
+    if (c !== undefined) {
+        return new ExpressionStack<N>(parent, op(b, toNode(c)));
+    }
+    if (parent instanceof ExpressionStack) {
+        return new ExpressionStack<N>(parent.parent, op(parent.b, b)) as N;
+    } else {
+        return new Expression(op((parent as Expression).a, b)) as N;
+    }
+}
 
 export class ExpressionStack<N extends ExpressionStack<any> | Expression> {
-    constructor(readonly a: N, readonly b: INode) { }
+    constructor(readonly parent: N, readonly b: INode) { }
 
     public plus(): N;
     public plus(c: Term): ExpressionStack<N>;
     public plus(c?: Term): N | ExpressionStack<N> {
-        if (c !== undefined) {
-            return new ExpressionStack<N>(this.a, add(this.b, toNode(c)));
-        }
-        if (this.a instanceof ExpressionStack) {
-            return new ExpressionStack<N>(this.a.a, add(this.a.b, this.b)) as N;
-        }
-        return new Expression(add(this.a.a, this.b)) as N;
+        return stack(add, this.parent, this.b, c);
     }
 
     public minus(): N;
     public minus(c: Term): ExpressionStack<N>;
     public minus(c?: Term): N | ExpressionStack<N> {
-        if (c !== undefined) {
-            return new ExpressionStack<N>(this.a, sub(this.b, toNode(c)));
-        }
-        if (this.a instanceof ExpressionStack) {
-            return new ExpressionStack<N>(this.a.a, sub(this.a.b, this.b)) as N;
-        }
-        return new Expression(sub(this.a.a, this.b)) as N;
+        return stack(sub, this.parent, this.b, c);
     }
 
     public times(): N;
     public times(c: Term): ExpressionStack<N>;
     public times(c?: Term): N | ExpressionStack<N> {
-        if (c !== undefined) {
-            return new ExpressionStack<N>(this.a, mult(this.b, toNode(c)));
-        }
-        if (this.a instanceof ExpressionStack) {
-            return new ExpressionStack<N>(this.a.a, mult(this.a.b, this.b)) as N;
-        }
-        return new Expression(mult(this.a.a, this.b)) as N;
+        return stack(mult, this.parent, this.b, c);
     }
 
     public divide(): N {
-        if (this.a instanceof ExpressionStack) {
-            return new ExpressionStack<N>(this.a.a, mult(this.a.b, this.b)) as N;
-        }
-        return new Expression(mult(this.a.a, this.b)) as N;
+        return stack(div, this.parent, this.b, undefined) as N;
     }
 
     public dividedBy(c: Term): ExpressionStack<N> {
-        return new ExpressionStack<N>(this.a, mult(this.b, toNode(c)));
+        return stack(div, this.parent, this.b, c) as ExpressionStack<N>;
     }
 
     public eq(): N;
     public eq(c: Term): ExpressionStack<N>;
     public eq(c?: Term): N | ExpressionStack<N> {
-        if (c !== undefined) {
-            return new ExpressionStack<N>(this.a, eq(this.b, toNode(c)));
-        }
-        if (this.a instanceof ExpressionStack) {
-            return new ExpressionStack<N>(this.a.a, eq(this.a.b, this.b)) as N;
-        }
-        return new Expression(eq(this.a.a, this.b)) as N;
+        return stack(eq, this.parent, this.b, c);
     }
 
     public squared(): ExpressionStack<N> {
@@ -68,19 +54,19 @@ export class ExpressionStack<N extends ExpressionStack<any> | Expression> {
     }
 
     public toThe(c: number): ExpressionStack<N> {
-        return new ExpressionStack<N>(this.a, pow(this.b, c));
+        return stack(pow, this.parent, this.b, c) as ExpressionStack<N>;
     }
 
     public sin(): ExpressionStack<N> {
-        return new ExpressionStack<N>(this.a, sin(this.b));
+        return new ExpressionStack<N>(this.parent, sin(this.b));
     }
 
     public cos(): ExpressionStack<N> {
-        return new ExpressionStack<N>(this.a, cos(this.b));
+        return new ExpressionStack<N>(this.parent, cos(this.b));
     }
 
     public tan(): ExpressionStack<N> {
-        return new ExpressionStack<N>(this.a, tan(this.b));
+        return new ExpressionStack<N>(this.parent, tan(this.b));
     }
 
     public push(b: Term): ExpressionStack<ExpressionStack<N>> {

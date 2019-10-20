@@ -10,9 +10,17 @@
     "clean": "rm -rf ./dist",
     "lint": "tslint -p tsconfig.json",
     "compile": "tsc",
-    "prepare": "npm run clean && npm run lint && npm run test && npm run compile"
+    "declare": "tsc --declaration --outDir . --emitDeclarationOnly",
+    "prepare": "yarn clean && yarn lint && yarn test && yarn compile",
+    "prepublishOnly": "yarn compile && yarn declare",
+    "postpublish": "rm -r *.d.ts dist"
   },
-  "keywords": ["math", "algebra", "expression", "derivative"],
+  "keywords": [
+    "math",
+    "algebra",
+    "expression",
+    "derivative"
+  ],
   "author": "George Campbell",
   "license": "ISC",
   "devDependencies": {
@@ -26,7 +34,9 @@
   "module": "dist/index.js",
   "dependencies": {},
   "jest": {
-    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
     "collectCoverage": true
   }
 }

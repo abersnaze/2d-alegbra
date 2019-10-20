@@ -1,6 +1,6 @@
-import { Assignments } from "..";
+import { Assignments } from "../Expression";
 import { Constant } from "./Constant";
-import { add, INode, mult } from "./INode";
+import { add, INode, mult } from "./index";
 
 export class Multiply implements INode {
   constructor(readonly a: INode, readonly b: INode) { }

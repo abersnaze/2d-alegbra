@@ -1,4 +1,4 @@
-import { Assignments } from "..";
+import { Assignments, Expression } from "../Expression";
 import { Add } from "./Add";
 import { Constant } from "./Constant";
 import { Cosine } from "./Cosine";
@@ -7,6 +7,8 @@ import { Pow } from "./Power";
 import { Sine } from "./Sine";
 import { Variable } from "./Variable";
 
+export type Term = number | symbol | Expression;
+
 export interface INode {
   eval(assign: Assignments): number;
   derivative(withRespectTo: symbol): INode;
@@ -14,6 +16,18 @@ export interface INode {
   coefficient(): [number, INode];
   exponent(): [number, INode];
   toString(indent?: string): string;
+}
+
+export function toNode(x: Term): INode {
+  if (typeof x === "symbol") {
+    return variable(x);
+  } else if (typeof x === "number") {
+    return value(x);
+  } else if (x instanceof Expression) {
+    return x.a;
+  } else {
+    throw new Error("term is not number, symbole, or Expression");
+  }
 }
 
 const vars = new Map<symbol, Variable>();

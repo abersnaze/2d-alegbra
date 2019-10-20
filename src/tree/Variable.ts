@@ -1,5 +1,5 @@
-import { Assignments } from "..";
-import { INode, value } from "./INode";
+import { Assignments } from "../Expression";
+import { INode, value } from "./index";
 
 export class Variable implements INode {
   private static idSequence = 1;
