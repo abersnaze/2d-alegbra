@@ -1,5 +1,5 @@
 import { Assignments } from "../Expression";
-import { cos, INode, mult, value } from "./index";
+import { cos, degreeSum, INode, mult } from "./index";
 
 export class Sine implements INode {
   constructor(readonly a: INode) { }
@@ -13,7 +13,7 @@ export class Sine implements INode {
   }
 
   public degree(): Map<INode, number> {
-    return new Map<INode, number>([[this, 1], [value(0), 1]]);
+    return new Map<INode, number>([[this, 1], [degreeSum, 1]]);
   }
 
   public coefficient(): [number, INode] {

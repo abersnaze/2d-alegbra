@@ -1,5 +1,5 @@
 import { Assignments } from "../Expression";
-import { INode, value } from "./index";
+import { degreeSum, INode, value } from "./index";
 
 export class Constant implements INode {
   constructor(readonly n: number) { }
@@ -13,7 +13,7 @@ export class Constant implements INode {
   }
 
   public degree(): Map<INode, number> {
-    return new Map([[value(0), 0]]);
+    return new Map([[degreeSum, 0]]);
   }
 
   public coefficient(): [number, INode] {

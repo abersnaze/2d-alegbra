@@ -97,6 +97,8 @@ export function sub(a: INode, b: INode): INode {
 const zero = new Constant(0);
 const one = new Constant(1);
 const negOne = new Constant(-1);
+// marker used in computing the sort order of terms.
+export const degreeSum = new Constant(NaN);
 
 export function mult(a: INode, b: INode): INode {
   // distribute 2*(x+y) => 2x+2y
@@ -155,7 +157,10 @@ export function pow(a: INode, b: number): INode {
   if (b === 1) {
     return a;
   }
-  if (b > 1 && (a instanceof Add || a instanceof Multiply)) {
+  // unroll (x + y)^N => (x + y) * (x + y)....
+  // unroll (x * y)^N => (x * y) * (x * y)....
+  // so that the distribution rule can be applied
+  if (Number.isInteger(b) && (a instanceof Add || a instanceof Multiply)) {
     return mult(a, pow(a, b - 1));
   }
   if (a instanceof Constant) {
@@ -222,18 +227,19 @@ export function degreeComparator(a: INode, b: INode): number {
     return 1 - 0;
   }
 
-  const aTotal = aDegrees.get(value(0))!;
-  const bTotal = bDegrees.get(value(0))!;
-  if (aTotal !== bTotal) {
+  const aTotal = aDegrees.get(degreeSum)!;
+  const bTotal = bDegrees.get(degreeSum)!;
+  // Math.abs allow x and 1/x to sort to the same place to be canceled out
+  if (Math.abs(aTotal) !== Math.abs(bTotal)) {
     return aTotal - bTotal;
   }
 
   for (const v of Array.from([...aDegrees.keys(), ...bDegrees.keys()]).sort()) {
     const aDegree = aDegrees.get(v) || 0;
     const bDegree = bDegrees.get(v) || 0;
-    const diff = aDegree - bDegree;
-    if (diff !== 0) {
-      return diff;
+    // Math.abs allow x and 1/x to sort to the same place to be canceled out
+    if (Math.abs(aDegree) !== Math.abs(bDegree)) {
+      return aDegree - bDegree;
     }
   }
 

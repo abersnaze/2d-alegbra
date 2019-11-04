@@ -22,10 +22,11 @@ export class Multiply implements INode {
     if (aDegrees === undefined || bDegrees === undefined) {
       return undefined;
     }
+    const degrees = new Map(aDegrees);
     bDegrees.forEach((bDegree, bExp) => {
-      return aDegrees.set(bExp, (aDegrees.get(bExp) || 0) + bDegree);
+      return degrees.set(bExp, (aDegrees.get(bExp) || 0) + bDegree);
     });
-    return aDegrees;
+    return degrees;
   }
 
   public coefficient(): [number, INode] {

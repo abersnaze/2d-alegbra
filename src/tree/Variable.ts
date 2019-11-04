@@ -1,5 +1,5 @@
 import { Assignments } from "../Expression";
-import { INode, value } from "./index";
+import { degreeSum, INode, value } from "./index";
 
 export class Variable implements INode {
   private static idSequence = 1;
@@ -22,7 +22,7 @@ export class Variable implements INode {
   }
 
   public degree(): Map<INode, number> {
-    return new Map<INode, number>([[this, 1], [value(0), 1]]);
+    return new Map<INode, number>([[this, 1], [degreeSum, 1]]);
   }
 
   public coefficient(): [number, INode] {
