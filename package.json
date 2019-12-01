@@ -1,19 +1,14 @@
 {
   "name": "2d-algebra",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Library for building expressions and computing derivatives",
   "repository": "github:abersnaze/2d-algebra",
-  "main": "dist/index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "jest",
-    "watch": "jest --watch",
-    "clean": "rm -rf ./dist",
-    "lint": "tslint -p tsconfig.json",
-    "compile": "tsc",
-    "declare": "tsc --declaration --outDir . --emitDeclarationOnly",
-    "prepare": "yarn clean && yarn lint && yarn test && yarn compile",
-    "prepublishOnly": "yarn compile && yarn declare",
-    "postpublish": "rm -r *.d.ts dist"
+    "test": "mocha --compilers ts:ts-node/register",
+    "test:w": "npm test -- -w",
+    "compile": "tsc"
   },
   "keywords": [
     "math",
@@ -24,19 +19,12 @@
   "author": "George Campbell",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^24.0.18",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.1.0",
-    "tslint": "^5.19.0",
+    "@types/chai": "^3.4.29",
+    "@types/mocha": "^2.2.28",
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.2"
   },
-  "types": "dist/index.d.ts",
-  "module": "dist/index.js",
-  "dependencies": {},
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "collectCoverage": true
-  }
+  "dependencies": {}
 }
