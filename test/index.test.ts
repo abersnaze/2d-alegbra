@@ -3,6 +3,40 @@ import { expect } from 'chai';
 import expression from '../src/';
 
 describe("expression", () => {
+  it("README", () => {
+    const m = 3; // slope
+    const b = 4; // point
+    const x = Symbol("x");
+    const y = Symbol(); // naming your symbols is optional
+    const line = expression(m).times(x).plus(b).eq(y);
+
+    const solution = new Map([[x, 7483], [y, 22453]]);
+
+    const err = line.eval(solution)
+    expect(err).to.equal(0);
+
+    const dxLine = line.derivative(x);
+    const xSlope = dxLine.eval(solution);
+    expect(xSlope).to.equal(0);
+
+    const dyLine = line.derivative(y);
+    const ySlope = dyLine.eval(solution);
+    expect(ySlope).to.equal(0);
+
+    const dx2Line = dxLine.derivative(x);
+    const xCup = dx2Line.eval(solution);
+    expect(xCup).to.be.greaterThan(0);
+
+    const dy2Line = dyLine.derivative(y);
+    const yCup = dx2Line.eval(solution);
+    expect(yCup).to.be.greaterThan(0);
+
+    const dxdyLine = dxLine.derivative(y);
+    const hessianDet = dx2Line.times(dy2Line).minus(dxdyLine.squared());    
+    const xySaddle = hessianDet.eval(solution);
+    expect(xySaddle).to.equal(0);
+  })
+
   it("1+2 => 3", () => {
     const q = expression(1).plus(2);
     expect(q.toString()).to.equal("3");

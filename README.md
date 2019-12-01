@@ -1,26 +1,141 @@
-Typescript node module template
-===============================
+# 2D Algebra Typescript Module
 
-Basic template for creating typescript node modules with mocha and wallaby test suites.
+A library for programatically building up large systems of equations for numerical analysis.
 
-### Howto
+[![NPM Version][npm-image]][npm-url]
+[![Downloads Stats][npm-downloads]][npm-url]
 
-* `npm install` - install dependencies
-* `npm test` - run tests
-* `npm run test:w` - run tests in watch mode
-* `npm run compile` - compile your code into the `lib/` folder
-* `wallaby start` in ms code to see tests and code coverage as you type
+## Technologies
+Project is created with:
+* Typescript version: 3.6.2
+* Node version: 12.10.0
+* No external dependencies
 
-*Make sure you have node and `npm` installed - wallaby requires you to install the `wallabyjs` plugin in your editor*
+## Setup
+To use this library
 
-*Note depends on Typescript 2.1+ theres added MS Code config*
+`npm install 2d-algebra`
 
-### Todo
+Then in your code you can import and use the `expression(...)` function to fluently build expressions.
 
-* Add better documentation / get started docs
-* Add ts-linting?
-* Add istanbul code coverage?
+```js
+import expression from "2d-algebra";
 
-Kind regards
+const m = 3; // slope
+const b = 4; // point
+const x = Symbol("x");
+const y = Symbol(); // naming your symbols is optional
+const line = expression(m).times(x).plus(b).eq(y);
 
-Morten
+const solution = new Map([[x, 7483], [y, 22453]]);
+
+const err = line.eval(solution)
+// err === 0
+
+const dxLine = line.derivative(x);
+const xSlope = dxLine.eval(solution);
+// dxErr = 0
+
+const dyLine = line.derivative(y);
+const ySlope = dyLine.eval(solution);
+// dyErr = 0
+
+const dx2Line = dxLine.derivative(x);
+const dy2Line = dyLine.derivative(y);
+const dxdyLine = dxLine.derivative(y);
+const xySaddle = dx2Line.times(dy2Line).plus(dxdyLine.times(4));
+
+const xCup = dx2Line.eval(solution);
+const yCup = dx2Line.eval(solution);
+
+```
+
+## API
+
+Creating a new `Expression` is a easy as starting it off with the first `symbol` or `number`.
+
+```
+const one = expression(1).eval(new Map());
+```
+
+From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number` or `Expression`.
+
+| Method       | Description                                   |
+|--------------|-----------------------------------------------|
+| plus(b)      | add the top term to `b` and simplifies        |
+| minus(b)     | equivalent to `plus(-b)`                      |
+| times(b)     | multiplies the top term with b and simplifies |
+| dividedBy(b) | equivalent to `times(b^-1)`                   |
+| toThe(n)     | raises the top term by the `number` n.        |
+| squared()    | equivalent to `toThe(2)`                      |
+| sin()        | replaces the top term with the sin(a)         |
+| cos()        | replaces the top term with the cos(a)         |
+| tan()        | equivalent to `sin(a).dividedBy(cos(a))`      |
+| eq(b)        | equivalent to `minus(b).squared()`            |
+
+Once the expression is complete you can use the following methods
+
+| Method                    | Description                                   |
+|---------------------------|-----------------------------------------------|
+| eval(Map<symbol, number>) | fully evaluate the expression. throw error if not all of the symbols are defined. |
+| derivative(symbol)        | compute the partial derivative with respect to one symbol. |
+| toString()                | makes a ASCII art tree diagram of the expression tree. |
+
+### Why no parentheses? `(` or `)`
+
+At this point you've probably run into an expression where you only want to apply the next `times` or `squared` to only part of what comes before. For example the unit (of radius 1) circle one might mistakenly define it as:
+
+```js
+const r = 1;
+const x = Symbol();
+const y = Symbol();
+
+// EXAMPLE OF HOW TO DO IT WRONG
+const circle = expression(x)
+  .squared()  //   x^2 
+  .plus(y)    //   x^2 + y
+  .squared()  //  (x^2 + y)^2
+  .eq(r)      //  (x^2 + y)^2 - r)^2
+  .squared(); // ((x^2 + y)^2 - r)^2)^2
+```
+
+Would produce `((x^2 + y)^2 - r)^2)^2`. When I would have expected `(x^2 + y^2 - r^2)^2`. Notice how in the wrong expression each application of the `squared()` applied to the whole of expression defined up to that point. To fix this I'll introduce the `push(b)` method that starts a new mini expression separate from what has been defined so far. When `push` is used new zero argument versions of `plus()`, `minus()`, `times()`, `divide()`, and `eq()` are available to cause the two mini expressions to be merged into one again.
+
+The corrected code now looks like:
+
+```js
+const circle = expression(x)
+  .squared()  //  x^2
+  .push(y)    //  x^2 | y   <---- y here is separate from x^2
+  .squared()  //  x^2 | y^2 <---- now that y is squared on its own
+  .plus()     //  x^2 + y^2 <---- merge y^2 by adding it to x^2
+  .push(r)    //  x^2 + y^2 | r
+  .squared()  //  x^2 + y^2 | r^2
+  .eq();      // (x^2 + y^2 - r^2)^2
+```
+
+## Contributing
+
+To submit changes to the project
+
+1. fork and clone the git repository
+2. make changes to the tests and source.
+   * If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
+   * Changes to simplification logic can be quite tricky with all the symbiotic recursion.
+3. run `npm test`. if they fail goto step 2
+4. push changes to your fork
+5. submit pull request
+
+### Other ussful  commands
+
+* `npm run clean`: clean the output folders `./dist`.
+* `npm run lint`: lint the ts files
+* `npm run compile`: compile the typescript code to POJS
+* `npm run test`: run unit tests once.
+* `npm run watch`: continuously run unit tests.
+
+<!-- Markdown link & img dfn's -->
+[npm-image]: https://img.shields.io/npm/v/2d-algebra.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/2d-algebra
+[npm-downloads]: https://img.shields.io/npm/dm/2d-algebra.svg?style=flat-square
+[wiki]: https://github.com/abersnaze/2d-algebra/wiki
