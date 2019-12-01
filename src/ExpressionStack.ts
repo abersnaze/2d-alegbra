@@ -1,5 +1,5 @@
 import { Expression } from "./Expression";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, toNode } from "./tree/index";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, toNode } from "./node/index";
 
 type Term = number | symbol | Expression;
 

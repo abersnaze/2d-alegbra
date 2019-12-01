@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./lib",
     "target": "es2015",
     "declaration": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true
+    "module": "commonjs",
+    "sourceMap": true
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "compileOnSave": false
+  "exclude": [
+    "test",
+    "lib",
+    "node_modules"
+  ]
 }

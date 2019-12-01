@@ -1,9 +1,5 @@
 import { ExpressionStack } from "./ExpressionStack";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode } from "./tree/index";
-
-export function expression(x: number | symbol): Expression {
-  return new Expression(toNode(x));
-}
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode } from "./node/index";
 
 export type Assignments = Map<symbol, number>;
 
