@@ -15,6 +15,7 @@ Project is created with:
 To use this library
 
 `npm install 2d-algebra`
+`yarn add 2d-algebra`
 
 Then in your code you can import and use the `expression(...)` function to fluently build expressions.
 
@@ -34,20 +35,24 @@ const err = line.eval(solution)
 
 const dxLine = line.derivative(x);
 const xSlope = dxLine.eval(solution);
-// dxErr = 0
+// xSlope === 0
 
 const dyLine = line.derivative(y);
 const ySlope = dyLine.eval(solution);
-// dyErr = 0
+// ySlope === 0
 
 const dx2Line = dxLine.derivative(x);
-const dy2Line = dyLine.derivative(y);
-const dxdyLine = dxLine.derivative(y);
-const xySaddle = dx2Line.times(dy2Line).plus(dxdyLine.times(4));
-
 const xCup = dx2Line.eval(solution);
-const yCup = dx2Line.eval(solution);
+// xCup > 0
 
+const dy2Line = dyLine.derivative(y);
+const yCup = dx2Line.eval(solution);
+// yCup > 0
+
+const dxdyLine = dxLine.derivative(y);
+const hessianDet = dx2Line.times(dy2Line).minus(dxdyLine.squared());    
+const xySaddle = hessianDet.eval(solution);
+// xySaddle === 0
 ```
 
 ## API
@@ -122,17 +127,15 @@ To submit changes to the project
 2. make changes to the tests and source.
    * If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
    * Changes to simplification logic can be quite tricky with all the symbiotic recursion.
-3. run `npm test`. if they fail goto step 2
+3. run `yarn test`. if they fail goto step 2
 4. push changes to your fork
 5. submit pull request
 
-### Other ussful  commands
+### Other ussful commands
 
-* `npm run clean`: clean the output folders `./dist`.
-* `npm run lint`: lint the ts files
-* `npm run compile`: compile the typescript code to POJS
-* `npm run test`: run unit tests once.
-* `npm run watch`: continuously run unit tests.
+* `yarn compile`: compile the typescript code to POJS
+* `yarn test`: run unit tests once.
+* `yarn watch`: continuously run unit tests.
 
 <!-- Markdown link & img dfn's -->
 [npm-image]: https://img.shields.io/npm/v/2d-algebra.svg?style=flat-square

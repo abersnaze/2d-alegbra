@@ -10,7 +10,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "test": "mocha --compilers ts:ts-node/register",
-    "test:w": "npm test -- -w",
+    "watch": "yarn test -- -w",
     "compile": "tsc"
   },
   "keywords": [
