@@ -1,6 +1,6 @@
 {
   "name": "2d-algebra",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Library for building expressions and computing derivatives",
   "repository": "github:abersnaze/2d-algebra",
   "main": "./lib/index.js",
