@@ -9,8 +9,8 @@
   ],
   "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "mocha --compilers ts:ts-node/register",
-    "watch": "yarn test -- -w",
+    "test": "mocha --require ts-node/register 'test/**/*.ts'",
+    "watch": "yarn test -w",
     "compile": "tsc"
   },
   "keywords": [
@@ -22,10 +22,10 @@
   "author": "George Campbell",
   "license": "ISC",
   "devDependencies": {
-    "@types/chai": "^3.4.29",
-    "@types/mocha": "^2.2.28",
-    "chai": "^3.5.0",
-    "mocha": "^2.5.3",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.2"
   },
