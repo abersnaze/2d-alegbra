@@ -1,7 +1,7 @@
 import { Expression } from "./Expression";
-import { toNode } from "./node";
+import { toNode, Identifier } from "./node";
 
-export default function expression(a: number | symbol): Expression {
+export default function expression(a: number | Identifier): Expression {
     return new Expression(toNode(a));
 }
 export * from "./Expression";

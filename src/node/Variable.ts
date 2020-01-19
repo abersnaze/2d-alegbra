@@ -1,11 +1,11 @@
 import { Assignments } from "../Expression";
-import { degreeSum, INode, value } from "./index";
+import { degreeSum, INode, value, Identifier } from "./index";
 
 export class Variable implements INode {
   private static idSequence = 1;
   private description: string;
 
-  constructor(readonly a: symbol) {
+  constructor(readonly a: Identifier) {
     this.description = (this.a as any).description || ("x" + Variable.idSequence++);
   }
 
@@ -17,7 +17,7 @@ export class Variable implements INode {
     throw new Error("variable " + this + " not defined in " + JSON.stringify(assign));
   }
 
-  public derivative(withRespectTo: symbol): INode {
+  public derivative(withRespectTo: Identifier): INode {
     return (withRespectTo === this.a) ? value(1) : value(0);
   }
 

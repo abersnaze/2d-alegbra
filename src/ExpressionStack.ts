@@ -1,7 +1,7 @@
 import { Expression } from "./Expression";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, toNode } from "./node/index";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, toNode, Identifier } from "./node/index";
 
-type Term = number | symbol | Expression;
+type Term = number | Identifier | Expression;
 
 function stack<N extends ExpressionStack<any> | Expression>(op, parent: N, b: INode, c?: Term) {
     if (c !== undefined) {

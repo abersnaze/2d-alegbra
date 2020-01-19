@@ -1,7 +1,7 @@
 import { ExpressionStack } from "./ExpressionStack";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode } from "./node/index";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode, Identifier } from "./node/index";
 
-export type Assignments = Map<symbol, number>;
+export type Assignments = Map<Identifier, number>;
 
 export class Expression {
   constructor(readonly a: INode) { }
@@ -54,7 +54,7 @@ export class Expression {
     return this.a.toString(indent);
   }
 
-  public derivative(withRespectTo: symbol): Expression {
+  public derivative(withRespectTo: Identifier): Expression {
     return new Expression(this.a.derivative(withRespectTo));
   }
 

@@ -1,5 +1,5 @@
 import { Assignments } from "../Expression";
-import { degreeSum, INode, mult, sin, value } from "./index";
+import { degreeSum, INode, mult, sin, value, Identifier } from "./index";
 
 export class Cosine implements INode {
   constructor(readonly a: INode) { }
@@ -7,7 +7,7 @@ export class Cosine implements INode {
     return Math.cos(this.a.eval(assign));
   }
 
-  public derivative(withRespectTo: symbol): INode {
+  public derivative(withRespectTo: Identifier): INode {
     return mult(value(-1), mult(sin(this.a), this.a.derivative(withRespectTo)));
   }
 

@@ -1,5 +1,5 @@
 import { Assignments } from "../Expression";
-import { INode, mult, pow, value } from "./index";
+import { INode, mult, pow, value, Identifier } from "./index";
 
 export class Pow implements INode {
   constructor(readonly a: INode, readonly b: number) { }
@@ -8,7 +8,7 @@ export class Pow implements INode {
     return Math.pow(this.a.eval(assign), this.b);
   }
 
-  public derivative(withRespectTo: symbol): INode {
+  public derivative(withRespectTo: Identifier): INode {
     const da = this.a.derivative(withRespectTo);
     const x = pow(this.a, this.b - 1);
     const out = mult(mult(value(this.b), x), da);

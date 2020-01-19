@@ -7,11 +7,12 @@ import { Pow } from "./Power";
 import { Sine } from "./Sine";
 import { Variable } from "./Variable";
 
-export type Term = number | symbol | Expression;
+export type Identifier = symbol | string;
+export type Term = number | Identifier | Expression;
 
 export interface INode {
   eval(assign: Assignments): number;
-  derivative(withRespectTo: symbol): INode;
+  derivative(withRespectTo: Identifier): INode;
   degree(): Map<INode, number> | undefined;
   coefficient(): [number, INode];
   exponent(): [number, INode];
@@ -19,19 +20,20 @@ export interface INode {
 }
 
 export function toNode(x: Term): INode {
-  if (typeof x === "symbol") {
-    return variable(x);
-  } else if (typeof x === "number") {
-    return value(x);
+  const typeofX = typeof x;
+  if (typeofX === "symbol" || typeofX === "string") {
+    return variable(x as Identifier);
+  } else if (typeofX === "number") {
+    return value(x as number);
   } else if (x instanceof Expression) {
     return x.a;
   } else {
-    throw new Error("term is not number, symbole, or Expression");
+    throw new Error("term is not number, symbol, string, or Expression");
   }
 }
 
-const vars = new Map<symbol, Variable>();
-export function variable(a: symbol = Symbol()): Variable {
+const vars = new Map<Identifier, Variable>();
+export function variable(a: Identifier = Symbol()): Variable {
   let v = vars.get(a);
   if (v !== undefined) {
     return v;

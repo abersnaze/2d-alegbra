@@ -1,6 +1,6 @@
 import { Assignments } from "../Expression";
 import { Constant } from "./Constant";
-import { add, INode, mult } from "./index";
+import { add, INode, mult, Identifier } from "./index";
 
 export class Multiply implements INode {
   constructor(readonly a: INode, readonly b: INode) { }
@@ -9,7 +9,7 @@ export class Multiply implements INode {
     return this.a.eval(assign) * this.b.eval(assign);
   }
 
-  public derivative(withRespectTo: symbol): INode {
+  public derivative(withRespectTo: Identifier): INode {
     // apply the power rule a*b... => a'*b + a*b'
     const da = this.a.derivative(withRespectTo);
     const db = this.b.derivative(withRespectTo);
