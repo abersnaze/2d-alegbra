@@ -1,4 +1,4 @@
-import { Assignments } from "../Expression";
+import { Assignments, Substitutions } from "../Expression";
 import { degreeSum, INode, value, Identifier } from "./index";
 
 export class Constant implements INode {
@@ -6,6 +6,10 @@ export class Constant implements INode {
 
   public eval(assign: Assignments): number {
     return this.n;
+  }
+
+  public apply(subs: Substitutions): INode {
+    return this;
   }
 
   public derivative(withRespectTo: Identifier): INode {

@@ -1,4 +1,4 @@
-import { Assignments } from "../Expression";
+import { Assignments, Substitutions } from "../Expression";
 import { degreeSum, INode, value, Identifier } from "./index";
 
 export class Variable implements INode {
@@ -15,6 +15,14 @@ export class Variable implements INode {
       return r;
     }
     throw new Error("variable " + this + " not defined in " + JSON.stringify(assign));
+  }
+
+  public apply(subs: Substitutions): INode {
+    const r = subs.get(this.a);
+    if (r !== undefined) {
+      return r.a;
+    }
+    return this;
   }
 
   public derivative(withRespectTo: Identifier): INode {

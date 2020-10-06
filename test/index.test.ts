@@ -184,5 +184,27 @@ describe("expression", () => {
   └ x`);
   });
 
-});
+  it("apply", () => {
+    const x = Symbol("x");
+    const y = Symbol("y");
 
+    const q = expression(-3).times(x).minus(y).eq(-2);
+    const subs = new Map([[y, expression(2).times(x).minus(5)]]);
+
+    const r = q.apply(subs);
+    expect(r.toString()).to.equal(`+
+├ 49
+└ +
+  ├ *
+  │ ├ -70
+  │ └ x
+  └ *
+    ├ 25
+    └ ^
+      ├ x
+      └ 2`);
+
+    const err = r.eval(new Map([[x, 1.4]]))
+    expect(err).to.be.closeTo(0, Number.EPSILON*32);
+  });
+});

@@ -1,7 +1,9 @@
 import { ExpressionStack } from "./ExpressionStack";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode, Identifier } from "./node/index";
+import { Constant } from "./node/Constant";
+import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode, Identifier, value } from "./node/index";
 
 export type Assignments = Map<Identifier, number>;
+export type Substitutions = Map<Identifier, Expression>;
 
 export class Expression {
   constructor(readonly a: INode) { }
@@ -60,5 +62,9 @@ export class Expression {
 
   public eval(assign: Assignments): number {
     return this.a.eval(assign);
+  }
+
+  public apply(subs: Substitutions): Expression {
+    return new Expression(this.a.apply(subs));
   }
 }

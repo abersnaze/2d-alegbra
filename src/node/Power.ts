@@ -1,4 +1,4 @@
-import { Assignments } from "../Expression";
+import { Assignments, Substitutions } from "../Expression";
 import { INode, mult, pow, value, Identifier } from "./index";
 
 export class Pow implements INode {
@@ -6,6 +6,10 @@ export class Pow implements INode {
 
   public eval(assign: Assignments): number {
     return Math.pow(this.a.eval(assign), this.b);
+  }
+
+  public apply(subs: Substitutions): INode {
+    return pow(this.a.apply(subs), this.b);
   }
 
   public derivative(withRespectTo: Identifier): INode {

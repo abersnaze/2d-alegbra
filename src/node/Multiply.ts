@@ -1,4 +1,4 @@
-import { Assignments } from "../Expression";
+import { Assignments, Substitutions } from "../Expression";
 import { Constant } from "./Constant";
 import { add, INode, mult, Identifier } from "./index";
 
@@ -7,6 +7,10 @@ export class Multiply implements INode {
 
   public eval(assign: Assignments): number {
     return this.a.eval(assign) * this.b.eval(assign);
+  }
+
+  public apply(subs: Substitutions): INode {
+    return mult(this.a.apply(subs), this.b.apply(subs));
   }
 
   public derivative(withRespectTo: Identifier): INode {

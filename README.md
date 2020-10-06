@@ -83,6 +83,7 @@ Once the expression is complete you can use the following methods
 | Method                    | Description                                   |
 |---------------------------|-----------------------------------------------|
 | eval(Map<symbol, number>) | fully evaluate the expression. throw error if not all of the symbols are defined. |
+| apply(Map<symbol, Expression>) | substitute one or more variables with expressions and return the new expression. |
 | derivative(symbol)        | compute the partial derivative with respect to one symbol. |
 | toString()                | makes a ASCII art tree diagram of the expression tree. |
 

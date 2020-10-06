@@ -1,4 +1,4 @@
-import { Assignments, Expression } from "../Expression";
+import { Assignments, Expression, Substitutions } from "../Expression";
 import { Add } from "./Add";
 import { Constant } from "./Constant";
 import { Cosine } from "./Cosine";
@@ -12,6 +12,7 @@ export type Term = number | Identifier | Expression;
 
 export interface INode {
   eval(assign: Assignments): number;
+  apply(subs: Substitutions): INode;
   derivative(withRespectTo: Identifier): INode;
   degree(): Map<INode, number> | undefined;
   coefficient(): [number, INode];
