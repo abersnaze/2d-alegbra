@@ -1,8 +1,14 @@
 import { Assignments, Substitutions } from "../Expression";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
 import { cos, degreeSum, Identifier, INode, mult, sin, value } from "./index";
 
 export class Cosine implements INode {
   constructor(readonly a: INode) { }
+
+  public op(): string {
+    return undefined;
+  }
 
   public eval(assign: Assignments): number {
     return Math.cos(this.a.eval(assign));
@@ -28,8 +34,7 @@ export class Cosine implements INode {
     return [1, this];
   }
 
-  public toString(indent = ""): string {
-    return "cosine" +
-      "\n" + indent + "└ " + this.a.toString(indent + "  ");
+  public toString(indent = "", fmt = new InlineFormat()): string {
+    return fmt.func(indent, "cos", this.a);
   }
 }

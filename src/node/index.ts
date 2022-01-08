@@ -1,4 +1,6 @@
 import { Assignments, Expression, Substitutions } from "../Expression";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
 import { Add } from "./Add";
 import { Constant } from "./Constant";
 import { Cosine } from "./Cosine";
@@ -11,13 +13,14 @@ export type Identifier = symbol | string;
 export type Term = number | Identifier | Expression;
 
 export interface INode {
+  op(): string;
   eval(assign: Assignments): number;
   apply(subs: Substitutions): INode;
   derivative(withRespectTo: Identifier): INode;
   degree(): Map<INode, number> | undefined;
   coefficient(): [number, INode];
   exponent(): [number, INode];
-  toString(indent?: string): string;
+  toString(indent?: string, fmt?: Format): string;
 }
 
 export function toNode(x: Term): INode {
@@ -164,13 +167,23 @@ export function pow(a: INode, b: number): INode {
   // unroll (x * y)^N => (x * y) * (x * y)....
   // so that the distribution rule can be applied
   if (Number.isInteger(b) && (a instanceof Add || a instanceof Multiply)) {
-    return mult(a, pow(a, b - 1));
+    const mag = Math.abs(b);
+    let base = one as INode;
+    for (let i = 0; i < mag; i++) {
+      base = mult(base, a);
+    }
+    if (b < 0) {
+      a = base;
+      b = -1;
+    } else {
+      return base;
+    }
   }
   if (a instanceof Constant) {
     return value(Math.pow(a.n, b));
   }
   if (a instanceof Pow) {
-    return pow(a.a, a.b + b);
+    return pow(a.a, Math.pow(a.b, b));
   }
   return new Pow(a, b);
 }
@@ -220,13 +233,18 @@ export function eq(a: INode, b: INode): INode {
  * @param b INode
  */
 export function degreeComparator(a: INode, b: INode): number {
+  console.log("############");
   const aDegrees = a.degree();
   const bDegrees = b.degree();
 
+  console.log("\ta:", a.toString(), aDegrees)
+  console.log("\tb:", b.toString(), bDegrees);
   if (aDegrees === undefined) {
+    console.log("\tau A < B");
     return 0 - 1;
   }
   if (bDegrees === undefined) {
+    console.log("\tbu A > B");
     return 1 - 0;
   }
 
@@ -234,17 +252,22 @@ export function degreeComparator(a: INode, b: INode): number {
   const bTotal = bDegrees.get(degreeSum)!;
   // Math.abs allow x and 1/x to sort to the same place to be canceled out
   if (Math.abs(aTotal) !== Math.abs(bTotal)) {
+    console.log("\ttot", aTotal - bTotal < 0 ? "A < B" : "A > B");
     return aTotal - bTotal;
   }
 
-  for (const v of Array.from([...aDegrees.keys(), ...bDegrees.keys()]).sort()) {
+  const keys = [...aDegrees.keys(), ...bDegrees.keys()];
+  for (const v of Array.from(keys).sort()) {
     const aDegree = aDegrees.get(v) || 0;
     const bDegree = bDegrees.get(v) || 0;
+    console.log("\t", v, '----', aDegree, '----', bDegree);
     // Math.abs allow x and 1/x to sort to the same place to be canceled out
     if (Math.abs(aDegree) !== Math.abs(bDegree)) {
+      console.log("\tpart", aDegree - bDegree < 0 ? "A < B" : "A > B");
       return aDegree - bDegree;
     }
   }
 
+  console.log("\tA = B");
   return 0;
 }

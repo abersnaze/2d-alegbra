@@ -1,4 +1,6 @@
 import { ExpressionStack } from "./ExpressionStack";
+import { InlineFormat } from "./format/InlineFormat";
+import { TreeFormat } from "./format/TreeFormat";
 import { Constant } from "./node/Constant";
 import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode, Identifier, value } from "./node/index";
 
@@ -52,8 +54,8 @@ export class Expression {
     return new ExpressionStack<Expression>(this, toNode(b));
   }
 
-  public toString(indent = "") {
-    return this.a.toString(indent);
+  public toString(indent = "", inline = true) {
+    return this.a.toString(indent, inline ? new InlineFormat() : new TreeFormat());
   }
 
   public derivative(withRespectTo: Identifier): Expression {

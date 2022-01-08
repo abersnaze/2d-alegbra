@@ -1,8 +1,14 @@
 import { Assignments, Substitutions } from "../Expression";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
 import { INode, mult, pow, value, Identifier } from "./index";
 
 export class Pow implements INode {
   constructor(readonly a: INode, readonly b: number) { }
+
+  public op(): string {
+    return "^";
+  }
 
   public eval(assign: Assignments): number {
     return Math.pow(this.a.eval(assign), this.b);
@@ -36,9 +42,7 @@ export class Pow implements INode {
     return [this.b, this.a];
   }
 
-  public toString(indent = ""): string {
-    return "^" +
-      "\n" + indent + "├ " + this.a.toString(indent + "│ ") +
-      "\n" + indent + "└ " + this.b;
+  public toString(indent = "", fmt = new InlineFormat()): string {
+    return fmt.binary(indent, this.op(), this.a, value(this.b));
   }
 }

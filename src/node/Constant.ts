@@ -1,8 +1,14 @@
 import { Assignments, Substitutions } from "../Expression";
-import { degreeSum, INode, value, Identifier } from "./index";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
+import { degreeSum, Identifier, INode, value } from "./index";
 
 export class Constant implements INode {
   constructor(readonly n: number) { }
+
+  public op(): string {
+    return undefined;
+  }
 
   public eval(assign: Assignments): number {
     return this.n;
@@ -28,7 +34,7 @@ export class Constant implements INode {
     return [1, this];
   }
 
-  public toString(indent = ""): string {
+  public toString(indent = "", fmt = new InlineFormat()): string {
     return this.n.toString();
   }
 }

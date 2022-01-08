@@ -4,3 +4,4 @@ coverage
 *.d.ts
 lib
 2d-algebra-v*.tgz
+.nyc_output

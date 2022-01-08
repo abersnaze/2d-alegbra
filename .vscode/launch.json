@@ -5,22 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Jest Tests",
             "type": "node",
             "request": "launch",
-            "name": "Tests",
-            "program": "${workspaceFolder}/node_modules/.bin/ava",
-            "args": [],
-            "internalConsoleOptions": "openOnSessionStart"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/js/index.js",
-            "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": [
-                "${workspaceFolder}/es/**/*.js"
-            ]
+            "runtimeArgs": [
+              "--inspect-brk",
+              "${workspaceRoot}/node_modules/.bin/jest",
+              "--runInBand"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "port": 9229
         }
     ]
 }

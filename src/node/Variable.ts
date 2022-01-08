@@ -1,4 +1,6 @@
 import { Assignments, Substitutions } from "../Expression";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
 import { degreeSum, INode, value, Identifier } from "./index";
 
 export class Variable implements INode {
@@ -7,6 +9,10 @@ export class Variable implements INode {
 
   constructor(readonly a: Identifier) {
     this.description = (this.a as any).description || ("x" + Variable.idSequence++);
+  }
+
+  public op(): string {
+    return undefined;
   }
 
   public eval(assign: Assignments): number {
@@ -41,7 +47,7 @@ export class Variable implements INode {
     return [1, this];
   }
 
-  public toString(): string {
+  public toString(indent = "", fmt = new InlineFormat()): string {
     return this.description;
   }
 }

@@ -1,9 +1,15 @@
 import { Assignments, Substitutions } from "../Expression";
+import { Format } from "../format";
+import { InlineFormat } from "../format/InlineFormat";
 import { Constant } from "./Constant";
 import { add, INode, mult, Identifier } from "./index";
 
 export class Multiply implements INode {
   constructor(readonly a: INode, readonly b: INode) { }
+
+  public op(): string {
+    return "*"
+  }
 
   public eval(assign: Assignments): number {
     return this.a.eval(assign) * this.b.eval(assign);
@@ -44,9 +50,7 @@ export class Multiply implements INode {
     return [1, this];
   }
 
-  public toString(indent = ""): string {
-    return "*" +
-      "\n" + indent + "├ " + this.a.toString(indent + "│ ") +
-      "\n" + indent + "└ " + this.b.toString(indent + "  ");
+  public toString(indent = "", fmt = new InlineFormat()): string {
+    return fmt.binary(indent, this.op(), this.a, this.b);
   }
 }
