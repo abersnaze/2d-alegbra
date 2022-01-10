@@ -1,5 +1,4 @@
 import { Assignments, Substitutions } from "../Expression";
-import { Format } from "../format";
 import { InlineFormat } from "../format/InlineFormat";
 import { degreeSum, Identifier, INode, value } from "./index";
 
@@ -22,8 +21,8 @@ export class Constant implements INode {
     return value(0);
   }
 
-  public degree(): Map<INode, number> {
-    return new Map([[degreeSum, 0]]);
+  public degree(): Array<[INode, number]> {
+    return [[degreeSum, 0]];
   }
 
   public coefficient(): [number, INode] {
@@ -36,5 +35,13 @@ export class Constant implements INode {
 
   public toString(indent = "", fmt = new InlineFormat()): string {
     return this.n.toString();
+  }
+
+  public equals(that: INode): boolean {
+    if (this === that)
+      return true;
+    if (!(that instanceof Constant))
+      return false;
+    return this.n === that.n;
   }
 }

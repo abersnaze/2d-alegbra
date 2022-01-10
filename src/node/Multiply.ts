@@ -1,8 +1,7 @@
 import { Assignments, Substitutions } from "../Expression";
-import { Format } from "../format";
 import { InlineFormat } from "../format/InlineFormat";
 import { Constant } from "./Constant";
-import { add, INode, mult, Identifier } from "./index";
+import { add, Identifier, INode, mult } from "./index";
 
 export class Multiply implements INode {
   constructor(readonly a: INode, readonly b: INode) { }
@@ -26,15 +25,20 @@ export class Multiply implements INode {
     return add(mult(da, this.b), mult(this.a, db));
   }
 
-  public degree(): Map<INode, number> | undefined {
+  public degree(): Array<[INode, number]> | undefined {
     const aDegrees = this.a.degree();
     const bDegrees = this.b.degree();
     if (aDegrees === undefined || bDegrees === undefined) {
       return undefined;
     }
-    const degrees = new Map(aDegrees);
-    bDegrees.forEach((bDegree, bExp) => {
-      return degrees.set(bExp, (aDegrees.get(bExp) || 0) + bDegree);
+    const degrees = [...aDegrees];
+    bDegrees.forEach(([bExp, bDegree]) => {
+      const index = degrees.findIndex(([exp, degree]) => exp.equals(bExp));
+      if (index === -1) {
+        degrees.push([bExp, bDegree]);
+      } else {
+        degrees[index][1] + bDegree;
+      }
     });
     return degrees;
   }
@@ -52,5 +56,13 @@ export class Multiply implements INode {
 
   public toString(indent = "", fmt = new InlineFormat()): string {
     return fmt.binary(indent, this.op(), this.a, this.b);
+  }
+
+  public equals(that: INode): boolean {
+    if (this === that)
+      return true;
+    if (!(that instanceof Multiply))
+      return false;
+    return this.a.equals(that.a) && this.b.equals(that.b);
   }
 }

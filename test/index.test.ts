@@ -1,5 +1,5 @@
-import 'mocha';
 import { expect } from 'chai';
+import 'mocha';
 import expression from '../src/';
 
 describe("expression", () => {
@@ -124,16 +124,16 @@ describe("expression", () => {
     expect(dq.toString()).to.equal(`2*x`);
   });
 
-  it("2+(3*x) => x", () => {
+  it("2+(3*x) => 2 + 3*x", () => {
     const x = Symbol("x");
     const q = expression(2).push(3).times(x).plus();
     expect(q.toString()).to.equal(`2 + 3*x`);
   });
 
-  it("2/(3*x) => x", () => {
+  it("2/(3*x) => 2/3*x^-1", () => {
     const x = Symbol("x");
     const q = expression(2).push(3).times(x).divide();
-    expect(q.toString()).to.equal("(3*x)^-1*2");
+    expect(q.toString()).to.equal("x^-1*0.6666666666666666");
   });
 
   it("derivative", () => {
@@ -173,9 +173,17 @@ describe("expression", () => {
 
   it('trig', () => {
     const theta = Symbol("Θ");
-    const q = expression(theta).sin().squared().push(theta).cos().squared().plus();
-    expect(q.toString()).to.equal("sin(Θ)^2 + cos(Θ)^2");
+    const q = expression(theta).sin().squared();
+    expect(q.toString()).to.equal("sin(Θ)^2");
     const dq = q.derivative(theta);
-    expect(dq.toString()).to.equal("1");
+    expect(dq.toString()).to.equal("2*sin(Θ)*cos(Θ)");
+
+    const r = expression(theta).cos().squared();
+    expect(r.toString()).to.equal("cos(Θ)^2");
+    const rq = r.derivative(theta);
+    expect(rq.toString()).to.equal("-2*sin(Θ)*cos(Θ)");
+
+    const ds = dq.plus(rq);
+    expect(ds.toString()).to.equal("0");
   })
 });

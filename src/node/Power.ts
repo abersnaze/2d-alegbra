@@ -1,9 +1,8 @@
 import { Assignments, Substitutions } from "../Expression";
-import { Format } from "../format";
 import { InlineFormat } from "../format/InlineFormat";
-import { INode, mult, pow, value, Identifier } from "./index";
+import { Identifier, INode, mult, pow, value } from "./index";
 
-export class Pow implements INode {
+export class Power implements INode {
   constructor(readonly a: INode, readonly b: number) { }
 
   public op(): string {
@@ -25,13 +24,12 @@ export class Pow implements INode {
     return out;
   }
 
-  public degree(): Map<INode, number> | undefined {
+  public degree(): Array<[INode, number]> | undefined {
     const degrees = this.a.degree();
     if (degrees === undefined) {
       return undefined;
     }
-    degrees.forEach((degree, exp) => degrees.set(exp, degree * this.b));
-    return degrees;
+    return degrees.map(([exp, degree]) => [exp, degree * this.b]);
   }
 
   public coefficient(): [number, INode] {
@@ -44,5 +42,13 @@ export class Pow implements INode {
 
   public toString(indent = "", fmt = new InlineFormat()): string {
     return fmt.binary(indent, this.op(), this.a, value(this.b));
+  }
+
+  public equals(that: INode): boolean {
+    if (this === that)
+      return true;
+    if (!(that instanceof Power))
+      return false;
+    return this.a.equals(that.a) && this.b === that.b;
   }
 }

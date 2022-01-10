@@ -1,8 +1,7 @@
 import { ExpressionStack } from "./ExpressionStack";
 import { InlineFormat } from "./format/InlineFormat";
 import { TreeFormat } from "./format/TreeFormat";
-import { Constant } from "./node/Constant";
-import { add, cos, div, eq, INode, mult, pow, sin, sub, tan, Term, toNode, Identifier, value } from "./node/index";
+import { add, cos, div, eq, Identifier, INode, mult, pow, sin, sub, tan, Term, toNode } from "./node/index";
 
 export type Assignments = Map<Identifier, number>;
 export type Substitutions = Map<Identifier, Expression>;

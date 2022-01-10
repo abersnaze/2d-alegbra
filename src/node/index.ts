@@ -1,11 +1,10 @@
 import { Assignments, Expression, Substitutions } from "../Expression";
 import { Format } from "../format";
-import { InlineFormat } from "../format/InlineFormat";
 import { Add } from "./Add";
 import { Constant } from "./Constant";
 import { Cosine } from "./Cosine";
 import { Multiply } from "./Multiply";
-import { Pow } from "./Power";
+import { Power } from "./Power";
 import { Sine } from "./Sine";
 import { Variable } from "./Variable";
 
@@ -17,10 +16,11 @@ export interface INode {
   eval(assign: Assignments): number;
   apply(subs: Substitutions): INode;
   derivative(withRespectTo: Identifier): INode;
-  degree(): Map<INode, number> | undefined;
+  degree(): Array<[INode, number]> | undefined;
   coefficient(): [number, INode];
   exponent(): [number, INode];
   toString(indent?: string, fmt?: Format): string;
+  equals(that: INode): boolean;
 }
 
 export function toNode(x: Term): INode {
@@ -103,8 +103,6 @@ export function sub(a: INode, b: INode): INode {
 const zero = new Constant(0);
 const one = new Constant(1);
 const negOne = new Constant(-1);
-// marker used in computing the sort order of terms.
-export const degreeSum = new Constant(NaN);
 
 export function mult(a: INode, b: INode): INode {
   // distribute 2*(x+y) => 2x+2y
@@ -163,10 +161,13 @@ export function pow(a: INode, b: number): INode {
   if (b === 1) {
     return a;
   }
+  if (a instanceof Multiply) {
+    return mult(pow(a.a, b), pow(a.b, b));
+  }
   // unroll (x + y)^N => (x + y) * (x + y)....
   // unroll (x * y)^N => (x * y) * (x * y)....
   // so that the distribution rule can be applied
-  if (Number.isInteger(b) && (a instanceof Add || a instanceof Multiply)) {
+  if (Number.isInteger(b) && a instanceof Add) {
     const mag = Math.abs(b);
     let base = one as INode;
     for (let i = 0; i < mag; i++) {
@@ -182,10 +183,10 @@ export function pow(a: INode, b: number): INode {
   if (a instanceof Constant) {
     return value(Math.pow(a.n, b));
   }
-  if (a instanceof Pow) {
+  if (a instanceof Power) {
     return pow(a.a, Math.pow(a.b, b));
   }
-  return new Pow(a, b);
+  return new Power(a, b);
 }
 
 export function div(a: INode, b: INode): INode {
@@ -227,47 +228,51 @@ export function eq(a: INode, b: INode): INode {
   return pow(eqZero, 2);
 }
 
+// marker used in computing the sort order of terms.
+export const degreeSum = new Constant(NaN);
+
 /**
  * Compare the degree (power of exponents) for each variable in the product
  * @param a INode
  * @param b INode
  */
 export function degreeComparator(a: INode, b: INode): number {
-  console.log("############");
   const aDegrees = a.degree();
   const bDegrees = b.degree();
 
-  console.log("\ta:", a.toString(), aDegrees)
-  console.log("\tb:", b.toString(), bDegrees);
   if (aDegrees === undefined) {
-    console.log("\tau A < B");
     return 0 - 1;
   }
   if (bDegrees === undefined) {
-    console.log("\tbu A > B");
     return 1 - 0;
   }
 
-  const aTotal = aDegrees.get(degreeSum)!;
-  const bTotal = bDegrees.get(degreeSum)!;
+  const aTotal = aDegrees.find(([aExp, aDegree]) => aExp.equals(degreeSum))[1];
+  const bTotal = bDegrees.find(([bExp, bDegree]) => bExp.equals(degreeSum))[1];
   // Math.abs allow x and 1/x to sort to the same place to be canceled out
   if (Math.abs(aTotal) !== Math.abs(bTotal)) {
-    console.log("\ttot", aTotal - bTotal < 0 ? "A < B" : "A > B");
     return aTotal - bTotal;
   }
-
-  const keys = [...aDegrees.keys(), ...bDegrees.keys()];
-  for (const v of Array.from(keys).sort()) {
-    const aDegree = aDegrees.get(v) || 0;
-    const bDegree = bDegrees.get(v) || 0;
-    console.log("\t", v, '----', aDegree, '----', bDegree);
-    // Math.abs allow x and 1/x to sort to the same place to be canceled out
-    if (Math.abs(aDegree) !== Math.abs(bDegree)) {
-      console.log("\tpart", aDegree - bDegree < 0 ? "A < B" : "A > B");
-      return aDegree - bDegree;
+  // create a set of expresions the hard way.
+  const exps = aDegrees.map(([aExp, aDegree]) => aExp);
+  bDegrees.forEach(([bExp, bDegree]) => {
+    if (exps.findIndex((exp) => exp.equals(bExp)) === -1) {
+      exps.push(bExp);
     }
-  }
+  });
+  exps.sort((a, b) => a.toString().localeCompare(b.toString()))
 
-  console.log("\tA = B");
+  for (const exp of exps) {
+    const aExpDegree = aDegrees.find(([aExp, aDegree]) => exp.equals(aExp))
+    const bExpDegree = bDegrees.find(([bExp, bDegree]) => exp.equals(bExp))
+
+    if (aExpDegree === undefined)
+      return 0 - 1;
+    if (bExpDegree === undefined)
+      return 1 - 0;
+    if (Math.abs(aExpDegree[1]) !== Math.abs(bExpDegree[1]))
+      return aExpDegree[1] - bExpDegree[1];
+  };
+
   return 0;
 }

@@ -1,14 +1,16 @@
 import { Assignments, Substitutions } from "../Expression";
-import { Format } from "../format";
 import { InlineFormat } from "../format/InlineFormat";
-import { degreeSum, INode, value, Identifier } from "./index";
+import { degreeSum, Identifier, INode, value } from "./index";
 
 export class Variable implements INode {
   private static idSequence = 1;
   private description: string;
 
   constructor(readonly a: Identifier) {
-    this.description = (this.a as any).description || ("x" + Variable.idSequence++);
+    if (typeof a === 'symbol')
+      this.description = (this.a as any).description || ("x" + Variable.idSequence++);
+    else
+      this.description = a;
   }
 
   public op(): string {
@@ -35,8 +37,8 @@ export class Variable implements INode {
     return (withRespectTo === this.a) ? value(1) : value(0);
   }
 
-  public degree(): Map<INode, number> {
-    return new Map<INode, number>([[this, 1], [degreeSum, 1]]);
+  public degree(): Array<[INode, number]> {
+    return [[this, 1], [degreeSum, 1]];
   }
 
   public coefficient(): [number, INode] {
@@ -49,5 +51,13 @@ export class Variable implements INode {
 
   public toString(indent = "", fmt = new InlineFormat()): string {
     return this.description;
+  }
+
+  public equals(that: INode): boolean {
+    if (this === that)
+      return true;
+    if (!(that instanceof Variable))
+      return false;
+    return this.a === that.a && this.description === that.description;
   }
 }
