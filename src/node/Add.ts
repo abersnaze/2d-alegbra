@@ -3,7 +3,7 @@ import { InlineFormat } from "../format/InlineFormat";
 import { add, Identifier, INode } from "./index";
 
 export class Add implements INode {
-  constructor(readonly a: INode, readonly b: INode) { }
+  constructor(readonly a: INode, readonly b: INode) {}
 
   public op(): string {
     return "+";
@@ -23,7 +23,7 @@ export class Add implements INode {
     return add(da, db);
   }
 
-  public degree(): Array<[INode, number]> | undefined {
+  public degree(): [INode, number][] | undefined {
     return undefined;
   }
 
@@ -40,10 +40,8 @@ export class Add implements INode {
   }
 
   public equals(that: INode): boolean {
-    if (this === that)
-      return true;
-    if (!(that instanceof Add))
-      return false;
+    if (this === that) return true;
+    if (!(that instanceof Add)) return false;
     return this.a.equals(that.a) && this.b.equals(that.b);
   }
 }

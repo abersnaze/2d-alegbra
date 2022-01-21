@@ -1,8 +1,9 @@
 import { Expression } from "./Expression";
-import { Identifier, toNode } from "./node";
+import { toNode, Term } from "./node";
 
-export default function expression(a: number | Identifier): Expression {
-    return new Expression(toNode(a));
+export function expression(a: Term): Expression {
+  return new Expression(toNode(a));
 }
 export * from "./Expression";
 export * from "./ExpressionStack";
+export { Term } from "./node";

@@ -1,13 +1,27 @@
 import { ExpressionStack } from "./ExpressionStack";
 import { InlineFormat } from "./format/InlineFormat";
 import { TreeFormat } from "./format/TreeFormat";
-import { add, cos, div, eq, Identifier, INode, mult, pow, sin, sub, tan, Term, toNode } from "./node/index";
+import {
+  add,
+  cos,
+  div,
+  eq,
+  Identifier,
+  INode,
+  mult,
+  pow,
+  sin,
+  sub,
+  tan,
+  Term,
+  toNode,
+} from "./node/index";
 
 export type Assignments = Map<Identifier, number>;
 export type Substitutions = Map<Identifier, Expression>;
 
 export class Expression {
-  constructor(readonly a: INode) { }
+  constructor(readonly a: INode) {}
 
   public plus(b: Term): Expression {
     return new Expression(add(this.a, toNode(b)));
@@ -33,15 +47,30 @@ export class Expression {
     return new Expression(pow(this.a, n));
   }
 
-  public sin(): Expression {
+  public sin(): Expression;
+  public sin(b: Term): ExpressionStack<Expression>;
+  public sin(b?: Term): Expression | ExpressionStack<Expression> {
+    if (b !== undefined) {
+      return this.push(b).sin();
+    }
     return new Expression(sin(this.a));
   }
 
-  public cos(): Expression {
+  public cos(): Expression;
+  public cos(b: Term): ExpressionStack<Expression>;
+  public cos(b?: Term): Expression | ExpressionStack<Expression> {
+    if (b !== undefined) {
+      return this.push(b).cos();
+    }
     return new Expression(cos(this.a));
   }
 
-  public tan(): Expression {
+  public tan(): Expression;
+  public tan(b: Term): ExpressionStack<Expression>;
+  public tan(b?: Term): Expression | ExpressionStack<Expression> {
+    if (b !== undefined) {
+      return this.push(b).tan();
+    }
     return new Expression(tan(this.a));
   }
 
@@ -54,7 +83,10 @@ export class Expression {
   }
 
   public toString(indent = "", inline = true) {
-    return this.a.toString(indent, inline ? new InlineFormat() : new TreeFormat());
+    return this.a.toString(
+      indent,
+      inline ? new InlineFormat() : new TreeFormat()
+    );
   }
 
   public derivative(withRespectTo: Identifier): Expression {

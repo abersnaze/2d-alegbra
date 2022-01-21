@@ -1,6 +1,6 @@
-import { expect } from 'chai';
-import 'mocha';
-import expression from '../src/';
+import { expect } from "chai";
+import "mocha";
+import { expression } from "../src/";
 
 describe("expression", () => {
   it("README", () => {
@@ -10,9 +10,12 @@ describe("expression", () => {
     const y = Symbol(); // naming your symbols is optional
     const line = expression(m).times(x).plus(b).eq(y);
 
-    const solution = new Map([[x, 7483], [y, 22453]]);
+    const solution = new Map([
+      [x, 7483],
+      [y, 22453],
+    ]);
 
-    const err = line.eval(solution)
+    const err = line.eval(solution);
     expect(err, "line error").to.equal(0);
 
     const dxLine = line.derivative(x);
@@ -31,11 +34,12 @@ describe("expression", () => {
     const yCup = dx2Line.eval(solution);
     expect(yCup, "y cup").to.be.greaterThan(0);
 
+    // https://en.wikipedia.org/wiki/Second_partial_derivative_test
     const dxdyLine = dxLine.derivative(y);
     const hessianDet = dx2Line.times(dy2Line).minus(dxdyLine.squared());
     const xySaddle = hessianDet.eval(solution);
     expect(xySaddle, "x,y saddle").to.equal(0);
-  })
+  });
 
   it("1+2 => 3", () => {
     const q = expression(1).plus(2);
@@ -133,17 +137,28 @@ describe("expression", () => {
   it("2/(3*x) => 2/3*x^-1", () => {
     const x = Symbol("x");
     const q = expression(2).push(3).times(x).divide();
-    expect(q.toString()).to.equal("x^-1*0.6666666666666666");
+    expect(q.toString()).to.equal("0.6666666666666666*x^-1");
   });
 
-  it("derivative", () => {
+  it("derivative product rule", () => {
     const x = Symbol("x");
-    const y = Symbol("y");
 
-    const q = expression(x).minus(3).squared();
-    expect(q.toString()).to.equal('9 + -6*x + x^2');
+    const r = expression(x).squared().push(x).plus(3);
+    const q = r.times();
+    expect(q.toString()).to.equal("3*x^2 + x^3");
     const dx = q.derivative(x);
-    expect(dx.toString()).to.equal('-6 + 2*x');
+    expect(dx.toString()).to.equal("6*x + 3*x^2");
+  });
+
+  it("derivative quoten rule", () => {
+    const x = Symbol("x");
+
+    const q = expression(x).squared().push(x).plus(3).divide();
+    expect(q.toString()).to.equal("(3 + x)^-1*x^2");
+    const dx = q.derivative(x);
+    expect(dx.toString()).to.equal(
+      "(9 + 6*x + x^2)^-1*-1*x^2 + (3 + x)^-1*2*x"
+    );
   });
 
   it("apply", () => {
@@ -167,11 +182,11 @@ describe("expression", () => {
       └ 2`);
     expect(r.toString()).to.equal(`49 + -70*x + 25*x^2`);
 
-    const err = r.eval(new Map([[x, 1.4]]))
+    const err = r.eval(new Map([[x, 1.4]]));
     expect(err).to.be.closeTo(0, Number.EPSILON * 32);
   });
 
-  it('trig', () => {
+  it("trig", () => {
     const theta = Symbol("Θ");
     const q = expression(theta).sin().squared();
     expect(q.toString()).to.equal("sin(Θ)^2");
@@ -185,5 +200,29 @@ describe("expression", () => {
 
     const ds = dq.plus(rq);
     expect(ds.toString()).to.equal("0");
+  });
+
+  it("tangent", () => {
+    const theta = Symbol("Θ");
+    const q = expression(theta).tan();
+    expect(q.toString()).to.equal("sin(Θ)*cos(Θ)^-1");
+    const dq = q.derivative(theta);
+    // it would be nice if simplified (cos^2 + sin^2) to 1.
+    // would likely take implementing multiple stragies for
+    // simplification and seeing which one was better
+    // could result in exponentially more time.
+    // or set up a system to identify these cases and code
+    // the simplier form.
+    expect(dq.toString()).to.equal("1 + sin(Θ)^2*cos(Θ)^-2");
+  });
+
+  it("constants", () => {
+    expect(expression(0).sin().toString()).to.equal("0");
+    expect(expression(Math.PI).cos().toString()).to.equal("-1");
+    expect(expression(0).tan().toString()).to.equal("0");
+    expect(expression(5).dividedBy(-1).toString()).to.equal("-5");
+    expect(expression(5).dividedBy(1).toString()).to.equal("5");
+    expect(expression(0).dividedBy(1).toString()).to.equal("0");
+    expect(expression("x").toThe(5).toThe(4).toString()).to.equal("x^20")
   })
 });

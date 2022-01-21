@@ -6,12 +6,15 @@ A library for programatically building up large systems of equations for numeric
 [![Downloads Stats][npm-downloads]][npm-url]
 
 ## Technologies
+
 Project is created with:
-* Typescript version: 3.6.2
-* Node version: 12.10.0
-* No external dependencies
+
+- Typescript version: 3.6.2
+- Node version: 12.10.0
+- No external dependencies
 
 ## Setup
+
 To use this library
 
 `npm install 2d-algebra`
@@ -28,9 +31,12 @@ const x = Symbol("x");
 const y = Symbol(); // naming your symbols is optional
 const line = expression(m).times(x).plus(b).eq(y);
 
-const solution = new Map([[x, 7483], [y, 22453]]);
+const solution = new Map([
+  [x, 7483],
+  [y, 22453],
+]);
 
-const err = line.eval(solution)
+const err = line.eval(solution);
 // err === 0
 
 const dxLine = line.derivative(x);
@@ -49,8 +55,9 @@ const dy2Line = dyLine.derivative(y);
 const yCup = dx2Line.eval(solution);
 // yCup > 0
 
+// https://en.wikipedia.org/wiki/Second_partial_derivative_test
 const dxdyLine = dxLine.derivative(y);
-const hessianDet = dx2Line.times(dy2Line).minus(dxdyLine.squared());    
+const hessianDet = dx2Line.times(dy2Line).minus(dxdyLine.squared());
 const xySaddle = hessianDet.eval(solution);
 // xySaddle === 0
 ```
@@ -65,27 +72,27 @@ const one = expression(1).eval(new Map());
 
 From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number` or `Expression`.
 
-| Method       | Description                                   |
-|--------------|-----------------------------------------------|
-| plus(b)      | add the top term to `b` and simplifies        |
-| minus(b)     | equivalent to `plus(-b)`                      |
-| times(b)     | multiplies the top term with b and simplifies |
-| dividedBy(b) | equivalent to `times(b^-1)`                   |
-| toThe(n)     | raises the top term by the `number` n.        |
-| squared()    | equivalent to `toThe(2)`                      |
-| sin()        | replaces the top term with the sin(a)         |
-| cos()        | replaces the top term with the cos(a)         |
-| tan()        | equivalent to `sin(a).dividedBy(cos(a))`      |
-| eq(b)        | equivalent to `minus(b).squared()`            |
+| Method       | Description                                          |
+| ------------ | ---------------------------------------------------- |
+| plus(b)      | add the top term to `b` and simplifies               |
+| minus(b)     | equivalent to `plus(-b)`                             |
+| times(b)     | multiplies the top term with b and simplifies        |
+| dividedBy(b) | equivalent to `push(b).toThe(-1).times()`            |
+| toThe(n)     | raises the top term by the `number` n.               |
+| squared()    | equivalent to `toThe(2)`                             |
+| sin()        | replaces the top term with the sine                  |
+| cos()        | replaces the top term with the cossine               |
+| tan()        | equivalent to `this.sin().push(this).cos().divide()` |
+| eq(b)        | equivalent to `minus(b).squared()`                   |
 
 Once the expression is complete you can use the following methods
 
-| Method                    | Description                                   |
-|---------------------------|-----------------------------------------------|
-| eval(Map<symbol, number>) | fully evaluate the expression. throw error if not all of the symbols are defined. |
-| apply(Map<symbol, Expression>) | substitute one or more variables with expressions and return the new expression. |
-| derivative(symbol)        | compute the partial derivative with respect to one symbol. |
-| toString()                | makes a ASCII art tree diagram of the expression tree. |
+| Method                         | Description                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| eval(Map<symbol, number>)      | fully evaluate the expression. throw error if not all of the symbols are defined. |
+| apply(Map<symbol, Expression>) | substitute one or more variables with expressions and return the new expression.  |
+| derivative(symbol)             | compute the partial derivative with respect to one symbol.                        |
+| toString()                     | makes a ASCII art tree diagram of the expression tree.                            |
 
 ### Why no parentheses? `(` or `)`
 
@@ -98,10 +105,10 @@ const y = Symbol();
 
 // EXAMPLE OF HOW TO DO IT WRONG
 const circle = expression(x)
-  .squared()  //   x^2 
-  .plus(y)    //   x^2 + y
-  .squared()  //  (x^2 + y)^2
-  .eq(r)      //  (x^2 + y)^2 - r)^2
+  .squared() //   x^2
+  .plus(y) //   x^2 + y
+  .squared() //  (x^2 + y)^2
+  .eq(r) //  (x^2 + y)^2 - r)^2
   .squared(); // ((x^2 + y)^2 - r)^2)^2
 ```
 
@@ -111,13 +118,13 @@ The corrected code now looks like:
 
 ```js
 const circle = expression(x)
-  .squared()  //  x^2
-  .push(y)    //  x^2 | y   <---- y here is separate from x^2
-  .squared()  //  x^2 | y^2 <---- now that y is squared on its own
-  .plus()     //  x^2 + y^2 <---- merge y^2 by adding it to x^2
-  .push(r)    //  x^2 + y^2 | r
-  .squared()  //  x^2 + y^2 | r^2
-  .eq();      // (x^2 + y^2 - r^2)^2
+  .squared() //  x^2
+  .push(y) //  x^2 | y   <---- y here is separate from x^2
+  .squared() //  x^2 | y^2 <---- now that y is squared on its own
+  .plus() //  x^2 + y^2 <---- merge y^2 by adding it to x^2
+  .push(r) //  x^2 + y^2 | r
+  .squared() //  x^2 + y^2 | r^2
+  .eq(); // (x^2 + y^2 - r^2)^2
 ```
 
 ## Contributing
@@ -126,19 +133,20 @@ To submit changes to the project
 
 1. fork and clone the git repository
 2. make changes to the tests and source.
-   * If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
-   * Changes to simplification logic can be quite tricky with all the symbiotic recursion.
+   - If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
+   - Changes to simplification logic can be quite tricky with all the symbiotic recursion.
 3. run `yarn test`. if they fail goto step 2
 4. push changes to your fork
 5. submit pull request
 
 ### Other ussful commands
 
-* `yarn compile`: compile the typescript code to POJS
-* `yarn test`: run unit tests once.
-* `yarn watch`: continuously run unit tests.
+- `yarn compile`: compile the typescript code to POJS
+- `yarn test`: run unit tests once.
+- `yarn watch`: continuously run unit tests.
 
 <!-- Markdown link & img dfn's -->
+
 [npm-image]: https://img.shields.io/npm/v/2d-algebra.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/2d-algebra
 [npm-downloads]: https://img.shields.io/npm/dm/2d-algebra.svg?style=flat-square

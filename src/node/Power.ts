@@ -3,7 +3,7 @@ import { InlineFormat } from "../format/InlineFormat";
 import { Identifier, INode, mult, pow, value } from "./index";
 
 export class Power implements INode {
-  constructor(readonly a: INode, readonly b: number) { }
+  constructor(readonly a: INode, readonly b: number) {}
 
   public op(): string {
     return "^";
@@ -24,12 +24,12 @@ export class Power implements INode {
     return out;
   }
 
-  public degree(): Array<[INode, number]> | undefined {
+  public degree(): [INode, number][] | undefined {
     const degrees = this.a.degree();
     if (degrees === undefined) {
       return undefined;
     }
-    return degrees.map(([exp, degree]) => [exp, degree * this.b]);
+    return degrees.map(([exp, degree]) => [exp, Math.abs(degree * this.b)]);
   }
 
   public coefficient(): [number, INode] {
@@ -45,10 +45,8 @@ export class Power implements INode {
   }
 
   public equals(that: INode): boolean {
-    if (this === that)
-      return true;
-    if (!(that instanceof Power))
-      return false;
+    if (this === that) return true;
+    if (!(that instanceof Power)) return false;
     return this.a.equals(that.a) && this.b === that.b;
   }
 }

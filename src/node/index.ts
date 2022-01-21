@@ -16,7 +16,7 @@ export interface INode {
   eval(assign: Assignments): number;
   apply(subs: Substitutions): INode;
   derivative(withRespectTo: Identifier): INode;
-  degree(): Array<[INode, number]> | undefined;
+  degree(): [INode, number][] | undefined;
   coefficient(): [number, INode];
   exponent(): [number, INode];
   toString(indent?: string, fmt?: Format): string;
@@ -122,12 +122,12 @@ export function mult(a: INode, b: INode): INode {
     if (cmp > 0) {
       return mult(b.a, mult(a, b.b));
     }
-    if (cmp === 0) {
-      const [aExp, aTerm] = a.exponent();
-      const [bExp] = b.a.exponent();
-      if (a instanceof Constant) {
-        return mult(value(a.n * (b.a as Constant).n), b.b);
-      }
+    if (a instanceof Constant && b.a instanceof Constant) {
+      return mult(value(a.n * b.a.n), b.b);
+    }
+    const [aExp, aTerm] = a.exponent();
+    const [bExp, bTerm] = b.a.exponent();
+    if (aTerm.equals(bTerm)) {
       return mult(pow(aTerm, aExp + bExp), b.b);
     }
   } else {
@@ -135,12 +135,12 @@ export function mult(a: INode, b: INode): INode {
     if (cmp > 0) {
       return mult(b, a);
     }
-    if (cmp === 0) {
-      const [aExp, aTerm] = a.exponent();
-      const [bExp] = b.exponent();
-      if (a instanceof Constant) {
-        return value(a.n * (b as Constant).n);
-      }
+    if (a instanceof Constant && b instanceof Constant) {
+      return value(a.n * b.n);
+    }
+    const [aExp, aTerm] = a.exponent();
+    const [bExp, bTerm] = b.exponent();
+    if (aTerm.equals(bTerm)) {
       return pow(aTerm, aExp + bExp);
     }
   }
@@ -184,7 +184,7 @@ export function pow(a: INode, b: number): INode {
     return value(Math.pow(a.n, b));
   }
   if (a instanceof Power) {
-    return pow(a.a, Math.pow(a.b, b));
+    return pow(a.a, a.b * b);
   }
   return new Power(a, b);
 }
@@ -247,32 +247,30 @@ export function degreeComparator(a: INode, b: INode): number {
     return 1 - 0;
   }
 
-  const aTotal = aDegrees.find(([aExp, aDegree]) => aExp.equals(degreeSum))[1];
-  const bTotal = bDegrees.find(([bExp, bDegree]) => bExp.equals(degreeSum))[1];
+  const aTotal = aDegrees.find(([aExp]) => aExp.equals(degreeSum))[1];
+  const bTotal = bDegrees.find(([bExp]) => bExp.equals(degreeSum))[1];
   // Math.abs allow x and 1/x to sort to the same place to be canceled out
   if (Math.abs(aTotal) !== Math.abs(bTotal)) {
     return aTotal - bTotal;
   }
   // create a set of expresions the hard way.
-  const exps = aDegrees.map(([aExp, aDegree]) => aExp);
-  bDegrees.forEach(([bExp, bDegree]) => {
+  const exps = aDegrees.map(([aExp]) => aExp);
+  bDegrees.forEach(([bExp]) => {
     if (exps.findIndex((exp) => exp.equals(bExp)) === -1) {
       exps.push(bExp);
     }
   });
-  exps.sort((a, b) => a.toString().localeCompare(b.toString()))
+  exps.sort((aExp, bExp) => aExp.toString().localeCompare(bExp.toString()));
 
   for (const exp of exps) {
-    const aExpDegree = aDegrees.find(([aExp, aDegree]) => exp.equals(aExp))
-    const bExpDegree = bDegrees.find(([bExp, bDegree]) => exp.equals(bExp))
+    const aExpDegree = aDegrees.find(([aExp]) => exp.equals(aExp));
+    const bExpDegree = bDegrees.find(([bExp]) => exp.equals(bExp));
 
-    if (aExpDegree === undefined)
-      return 0 - 1;
-    if (bExpDegree === undefined)
-      return 1 - 0;
+    if (aExpDegree === undefined) return 0 - 1;
+    if (bExpDegree === undefined) return 1 - 0;
     if (Math.abs(aExpDegree[1]) !== Math.abs(bExpDegree[1]))
       return aExpDegree[1] - bExpDegree[1];
-  };
+  }
 
   return 0;
 }

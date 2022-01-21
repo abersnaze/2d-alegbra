@@ -3,7 +3,7 @@ import { InlineFormat } from "../format/InlineFormat";
 import { cos, degreeSum, Identifier, INode, mult, sin } from "./index";
 
 export class Sine implements INode {
-  constructor(readonly a: INode) { }
+  constructor(readonly a: INode) {}
 
   public op(): string {
     return undefined;
@@ -21,8 +21,11 @@ export class Sine implements INode {
     return mult(cos(this.a), this.a.derivative(withRespectTo));
   }
 
-  public degree(): Array<[INode, number]> {
-    return [[this, 1], [degreeSum, 1]];
+  public degree(): [INode, number][] {
+    return [
+      [this, 1],
+      [degreeSum, 1],
+    ];
   }
 
   public coefficient(): [number, INode] {
@@ -38,10 +41,8 @@ export class Sine implements INode {
   }
 
   public equals(that: INode): boolean {
-    if (this === that)
-      return true;
-    if (!(that instanceof Sine))
-      return false;
+    if (this === that) return true;
+    if (!(that instanceof Sine)) return false;
     return this.a.equals(that.a);
   }
 }

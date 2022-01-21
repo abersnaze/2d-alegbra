@@ -1,5 +1,4 @@
 import { Assignments, Substitutions } from "../Expression";
-import { InlineFormat } from "../format/InlineFormat";
 import { degreeSum, Identifier, INode, value } from "./index";
 
 export class Variable implements INode {
@@ -7,10 +6,10 @@ export class Variable implements INode {
   private description: string;
 
   constructor(readonly a: Identifier) {
-    if (typeof a === 'symbol')
-      this.description = (this.a as any).description || ("x" + Variable.idSequence++);
-    else
-      this.description = a;
+    if (typeof a === "symbol")
+      this.description =
+        (this.a as symbol)["description"] || "x" + Variable.idSequence++;
+    else this.description = a;
   }
 
   public op(): string {
@@ -22,7 +21,9 @@ export class Variable implements INode {
     if (r !== undefined) {
       return r;
     }
-    throw new Error("variable " + this + " not defined in " + JSON.stringify(assign));
+    throw new Error(
+      "variable " + this + " not defined in " + JSON.stringify(assign)
+    );
   }
 
   public apply(subs: Substitutions): INode {
@@ -34,11 +35,14 @@ export class Variable implements INode {
   }
 
   public derivative(withRespectTo: Identifier): INode {
-    return (withRespectTo === this.a) ? value(1) : value(0);
+    return withRespectTo === this.a ? value(1) : value(0);
   }
 
-  public degree(): Array<[INode, number]> {
-    return [[this, 1], [degreeSum, 1]];
+  public degree(): [INode, number][] {
+    return [
+      [this, 1],
+      [degreeSum, 1],
+    ];
   }
 
   public coefficient(): [number, INode] {
@@ -49,15 +53,13 @@ export class Variable implements INode {
     return [1, this];
   }
 
-  public toString(indent = "", fmt = new InlineFormat()): string {
+  public toString(): string {
     return this.description;
   }
 
   public equals(that: INode): boolean {
-    if (this === that)
-      return true;
-    if (!(that instanceof Variable))
-      return false;
+    if (this === that) return true;
+    if (!(that instanceof Variable)) return false;
     return this.a === that.a && this.description === that.description;
   }
 }

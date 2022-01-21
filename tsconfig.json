@@ -6,9 +6,5 @@
     "module": "commonjs",
     "sourceMap": true
   },
-  "exclude": [
-    "test",
-    "lib",
-    "node_modules"
-  ]
+  "exclude": ["test", "lib", "node_modules"]
 }

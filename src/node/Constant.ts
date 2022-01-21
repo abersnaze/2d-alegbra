@@ -1,27 +1,25 @@
-import { Assignments, Substitutions } from "../Expression";
-import { InlineFormat } from "../format/InlineFormat";
-import { degreeSum, Identifier, INode, value } from "./index";
+import { degreeSum, INode, value } from "./index";
 
 export class Constant implements INode {
-  constructor(readonly n: number) { }
+  constructor(readonly n: number) {}
 
   public op(): string {
     return undefined;
   }
 
-  public eval(assign: Assignments): number {
+  public eval(): number {
     return this.n;
   }
 
-  public apply(subs: Substitutions): INode {
+  public apply(): INode {
     return this;
   }
 
-  public derivative(withRespectTo: Identifier): INode {
+  public derivative(): INode {
     return value(0);
   }
 
-  public degree(): Array<[INode, number]> {
+  public degree(): [INode, number][] {
     return [[degreeSum, 0]];
   }
 
@@ -33,15 +31,13 @@ export class Constant implements INode {
     return [1, this];
   }
 
-  public toString(indent = "", fmt = new InlineFormat()): string {
+  public toString(): string {
     return this.n.toString();
   }
 
   public equals(that: INode): boolean {
-    if (this === that)
-      return true;
-    if (!(that instanceof Constant))
-      return false;
+    if (this === that) return true;
+    if (!(that instanceof Constant)) return false;
     return this.n === that.n;
   }
 }
