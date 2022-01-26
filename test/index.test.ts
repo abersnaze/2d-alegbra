@@ -223,6 +223,6 @@ describe("expression", () => {
     expect(expression(5).dividedBy(-1).toString()).to.equal("-5");
     expect(expression(5).dividedBy(1).toString()).to.equal("5");
     expect(expression(0).dividedBy(1).toString()).to.equal("0");
-    expect(expression("x").toThe(5).toThe(4).toString()).to.equal("x^20")
-  })
+    expect(expression("x").toThe(5).toThe(4).toString()).to.equal("x^20");
+  });
 });

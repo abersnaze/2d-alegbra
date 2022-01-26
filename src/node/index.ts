@@ -1,5 +1,6 @@
 import { Assignments, Expression, Substitutions } from "../Expression";
 import { Format } from "../format";
+import { Absolute } from "./Abs";
 import { Add } from "./Add";
 import { Constant } from "./Constant";
 import { Cosine } from "./Cosine";
@@ -65,6 +66,9 @@ export function add(a: INode, b: INode): INode {
   if (a instanceof Add) {
     return add(a.a, add(a.b, b));
   }
+  if (a instanceof Absolute && b instanceof Absolute) {
+    return abs(add(a.a, b.a));
+  }
 
   // bubble sort the terms
   if (b instanceof Add) {
@@ -114,6 +118,9 @@ export function mult(a: INode, b: INode): INode {
   }
   if (a instanceof Multiply) {
     return mult(a.a, mult(a.b, b));
+  }
+  if (a instanceof Absolute && b instanceof Absolute) {
+    return abs(mult(a.a, b.a));
   }
 
   // bubble sort the terms
@@ -226,6 +233,22 @@ export function tan(a: INode) {
 export function eq(a: INode, b: INode): INode {
   const eqZero = sub(a, b);
   return pow(eqZero, 2);
+}
+
+export function abs(a: INode) {
+  if (a instanceof Constant) {
+    return value(Math.abs(a.n));
+  }
+  if (a instanceof Absolute) {
+    return a;
+  }
+  if (a instanceof Multiply && a.a instanceof Constant) {
+    return mult(value(Math.abs(a.a.n)), abs(a.b));
+  }
+  if (a instanceof Power && a.b % 2 == 0) {
+    return a;
+  }
+  return new Absolute(a);
 }
 
 // marker used in computing the sort order of terms.

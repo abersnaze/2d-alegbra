@@ -1,5 +1,5 @@
 import { Assignments, Substitutions } from "../Expression";
-import { degreeSum, Identifier, INode, value } from "./index";
+import { degreeSum, Identifier, INode, toNode, value } from "./index";
 
 export class Variable implements INode {
   private static idSequence = 1;
@@ -29,7 +29,7 @@ export class Variable implements INode {
   public apply(subs: Substitutions): INode {
     const r = subs.get(this.a);
     if (r !== undefined) {
-      return r.a;
+      return toNode(r);
     }
     return this;
   }

@@ -1,5 +1,8 @@
 import { Expression } from "./Expression";
+import { InlineFormat } from "./format/InlineFormat";
+import { TreeFormat } from "./format/TreeFormat";
 import {
+  abs,
   add,
   cos,
   div,
@@ -77,6 +80,17 @@ export class ExpressionStack<N extends ExpressionStack<any> | Expression> {
     return stack(pow, this.parent, this.b, c) as ExpressionStack<N>;
   }
 
+  public abs(): ExpressionStack<N>;
+  public abs(b: Term): ExpressionStack<ExpressionStack<N>>;
+  public abs(
+    b?: Term
+  ): ExpressionStack<N> | ExpressionStack<ExpressionStack<N>> {
+    if (b !== undefined) {
+      return this.push(b).abs();
+    }
+    return new ExpressionStack<N>(this.parent, abs(this.b));
+  }
+
   public sin(): ExpressionStack<N>;
   public sin(b: Term): ExpressionStack<ExpressionStack<N>>;
   public sin(
@@ -112,5 +126,12 @@ export class ExpressionStack<N extends ExpressionStack<any> | Expression> {
 
   public push(b: Term): ExpressionStack<ExpressionStack<N>> {
     return new ExpressionStack<ExpressionStack<N>>(this, toNode(b));
+  }
+
+  public toString(indent = "", inline = true) {
+    const pStr = this.parent.toString(indent, inline);
+    const fmt = inline ? new InlineFormat() : new TreeFormat();
+    const bStr = this.b.toString(indent, fmt);
+    return pStr + " | " + bStr;
   }
 }

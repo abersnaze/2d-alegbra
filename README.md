@@ -84,15 +84,16 @@ From there you can use the following methods to additional complexity. All metho
 | cos()        | replaces the top term with the cossine               |
 | tan()        | equivalent to `this.sin().push(this).cos().divide()` |
 | eq(b)        | equivalent to `minus(b).squared()`                   |
+| abs()        | replaces the top term with the absolution value      |
 
 Once the expression is complete you can use the following methods
 
-| Method                         | Description                                                                       |
-| ------------------------------ | --------------------------------------------------------------------------------- |
-| eval(Map<symbol, number>)      | fully evaluate the expression. throw error if not all of the symbols are defined. |
-| apply(Map<symbol, Expression>) | substitute one or more variables with expressions and return the new expression.  |
-| derivative(symbol)             | compute the partial derivative with respect to one symbol.                        |
-| toString()                     | makes a ASCII art tree diagram of the expression tree.                            |
+| Method                    | Description                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| eval(Map<symbol, number>) | fully evaluate the expression. throw error if not all of the symbols are defined.   |
+| apply(Map<symbol, Term>)  | substitute one or more variables with different term and return the new expression. |
+| derivative(symbol)        | compute the partial derivative with respect to one symbol.                          |
+| toString()                | makes a ASCII art tree diagram of the expression tree.                              |
 
 ### Why no parentheses? `(` or `)`
 

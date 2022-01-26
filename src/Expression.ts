@@ -2,6 +2,7 @@ import { ExpressionStack } from "./ExpressionStack";
 import { InlineFormat } from "./format/InlineFormat";
 import { TreeFormat } from "./format/TreeFormat";
 import {
+  abs,
   add,
   cos,
   div,
@@ -18,7 +19,7 @@ import {
 } from "./node/index";
 
 export type Assignments = Map<Identifier, number>;
-export type Substitutions = Map<Identifier, Expression>;
+export type Substitutions = Map<Identifier, Term>;
 
 export class Expression {
   constructor(readonly a: INode) {}
@@ -45,6 +46,15 @@ export class Expression {
 
   public toThe(n: number): Expression {
     return new Expression(pow(this.a, n));
+  }
+
+  public abs(): Expression;
+  public abs(b: Term): ExpressionStack<Expression>;
+  public abs(b?: Term): Expression | ExpressionStack<Expression> {
+    if (b !== undefined) {
+      return this.push(b).abs();
+    }
+    return new Expression(abs(this.a));
   }
 
   public sin(): Expression;
