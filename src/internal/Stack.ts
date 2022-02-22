@@ -1,4 +1,4 @@
-import { Identifier, IExpression, IExpressionStack as IStack, INode } from "../interface"
+import { Identifier, IExpression, IStack as IStack, INode } from "../interface"
 import { abs } from "./Abs"
 import { add, sub } from "./Add"
 import { eq, Expression, toNode } from "./Expression"

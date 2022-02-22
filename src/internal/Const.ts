@@ -18,7 +18,6 @@ export class Const implements INode {
   }
 }
 
-export const I = new Const(NaN)
 const NEG_ONE = new Const(-1)
 const ZERO = new Const(0)
 const ONE = new Const(1)
