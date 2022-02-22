@@ -1,10 +1,11 @@
-import { Assignments, Identifier, IExpression, IExpressionStack, INode, Substitutions, Term } from "../interface"
+import { Assignments, Identifier, IExpression, INode, IStack, Substitutions, Term } from "../interface"
 import { abs as _abs } from "./Abs"
 import { add, sub } from "./Add"
-import { Const, value } from "./Const"
-import { Stack } from "./Stack"
+import { Const, I as _I, value } from "./Const"
+import { log } from "./Log"
 import { div, mult } from "./Mult"
 import { pow } from "./Pow"
+import { Stack } from "./Stack"
 import { cos as _cos, sin as _sin, tan as _tan } from "./Trig"
 import { variable } from "./Var"
 
@@ -40,13 +41,17 @@ export class Expression implements IExpression {
 
   toThe = apply(pow, this)
 
+  log(): IExpression {
+    return new Expression(log(this.n));
+  }
+
   squared(): IExpression {
     return new Expression(pow(this.n, value(2)))
   }
 
   public abs(): IExpression
-  public abs(b: Term): IExpressionStack<IExpression>
-  public abs(b?: Term): IExpression | IExpressionStack<IExpression> {
+  public abs(b: Term): IStack<IExpression>
+  public abs(b?: Term): IExpression | IStack<IExpression> {
     if (b !== undefined) {
       return this.push(b).abs()
     }
@@ -54,8 +59,8 @@ export class Expression implements IExpression {
   }
 
   public sin(): IExpression
-  public sin(b: Term): IExpressionStack<IExpression>
-  public sin(b?: Term): IExpression | IExpressionStack<IExpression> {
+  public sin(b: Term): IStack<IExpression>
+  public sin(b?: Term): IExpression | IStack<IExpression> {
     if (b !== undefined) {
       return this.push(b).sin()
     }
@@ -63,8 +68,8 @@ export class Expression implements IExpression {
   }
 
   public cos(): IExpression
-  public cos(b: Term): IExpressionStack<IExpression>
-  public cos(b?: Term): IExpression | IExpressionStack<IExpression> {
+  public cos(b: Term): IStack<IExpression>
+  public cos(b?: Term): IExpression | IStack<IExpression> {
     if (b !== undefined) {
       return this.push(b).cos()
     }
@@ -72,8 +77,8 @@ export class Expression implements IExpression {
   }
 
   public tan(): IExpression
-  public tan(b: Term): IExpressionStack<IExpression>
-  public tan(b?: Term): IExpression | IExpressionStack<IExpression> {
+  public tan(b: Term): IStack<IExpression>
+  public tan(b?: Term): IExpression | IStack<IExpression> {
     if (b !== undefined) {
       return this.push(b).tan()
     }
@@ -84,7 +89,7 @@ export class Expression implements IExpression {
     return new Expression(eq(this.n, toNode(b)))
   }
 
-  public push(b: Term): IExpressionStack<IExpression> {
+  public push(b: Term): IStack<IExpression> {
     return new Stack<IExpression>(this, toNode(b))
   }
 
@@ -96,6 +101,9 @@ export class Expression implements IExpression {
   }
 
   eval(subs: Assignments): number {
+    subs.delete(I)
+    subs.set(PI, Math.PI)
+    subs.set(E, Math.E)
     const result = this.apply(subs)
     if (result.n instanceof Const) {
       return result.n.value
@@ -146,3 +154,6 @@ export function eq(a: INode, b: INode): INode {
   return pow(sub(a, b), value(2))
 }
 
+export const I = Symbol("𝑖")
+export const E = Symbol("𝑒")
+export const PI = Symbol("π")

@@ -4,28 +4,28 @@ export type Assignments = Map<Identifier, number>
 export type Substitutions = Map<Identifier, Term>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface IExpressionStack<N extends IExpressionStack<any> | IExpression> {
+export interface IStack<N extends IStack<any> | IExpression> {
   plus(): N
-  plus(c: Term): IExpressionStack<N>
+  plus(c: Term): IStack<N>
   minus(): N
-  minus(c: Term): IExpressionStack<N>
+  minus(c: Term): IStack<N>
   times(): N
-  times(c: Term): IExpressionStack<N>
+  times(c: Term): IStack<N>
   divide(): N
-  dividedBy(c: Term): IExpressionStack<N>
+  dividedBy(c: Term): IStack<N>
   eq(): N
-  eq(c: Term): IExpressionStack<N>
-  squared(): IExpressionStack<N>
-  toThe(c: Term): IExpressionStack<N>
-  abs(): IExpressionStack<N>
-  abs(b: Term): IExpressionStack<IExpressionStack<N>>
-  sin(): IExpressionStack<N>
-  sin(b: Term): IExpressionStack<IExpressionStack<N>>
-  cos(): IExpressionStack<N>
-  cos(b: Term): IExpressionStack<IExpressionStack<N>>
-  tan(): IExpressionStack<N>
-  tan(b: Term): IExpressionStack<IExpressionStack<N>>
-  push(b: Term): IExpressionStack<IExpressionStack<N>>
+  eq(c: Term): IStack<N>
+  squared(): IStack<N>
+  toThe(c: Term): IStack<N>
+  abs(): IStack<N>
+  abs(b: Term): IStack<IStack<N>>
+  sin(): IStack<N>
+  sin(b: Term): IStack<IStack<N>>
+  cos(): IStack<N>
+  cos(b: Term): IStack<IStack<N>>
+  tan(): IStack<N>
+  tan(b: Term): IStack<IStack<N>>
+  push(b: Term): IStack<IStack<N>>
   toString(): string
 }
 
@@ -36,16 +36,17 @@ export interface IExpression {
   dividedBy(b: Term): IExpression
   squared(): IExpression
   toThe(n: Term): IExpression
+  log(): IExpression
   abs(): IExpression
-  abs(b: Term): IExpressionStack<IExpression>
+  abs(b: Term): IStack<IExpression>
   sin(): IExpression
-  sin(b: Term): IExpressionStack<IExpression>
+  sin(b: Term): IStack<IExpression>
   cos(): IExpression
-  cos(b: Term): IExpressionStack<IExpression>
+  cos(b: Term): IStack<IExpression>
   tan(): IExpression
-  tan(b: Term): IExpressionStack<IExpression>
+  tan(b: Term): IStack<IExpression>
   eq(b: Term): IExpression
-  push(b: Term): IExpressionStack<IExpression>
+  push(b: Term): IStack<IExpression>
   toString(): string
   derivative(withRespectTo: Identifier): IExpression
   eval(subs: Assignments): number
