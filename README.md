@@ -67,10 +67,10 @@ const xySaddle = hessianDet.eval(solution);
 Creating a new `Expression` is a easy as starting it off with the first `symbol` or `number`.
 
 ```
-const one = expression(1).eval(new Map());
+const one = expression(1).eval(new Map())
 ```
 
-From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number` or `Expression`.
+From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number`, `Expression` or `Matrix`.
 
 | Method       | Description                                          |
 | ------------ | ---------------------------------------------------- |
@@ -126,6 +126,62 @@ const circle = expression(x)
   .push(r) //  x^2 + y^2 | r
   .squared() //  x^2 + y^2 | r^2
   .eq(); // (x^2 + y^2 - r^2)^2
+```
+
+### Matrices
+
+Matrices of expressions are also supported. The first call to `matrix()` creates a row matrix and subsequent calls creates a new matrix with additional row.
+
+```js
+const M = matrix(1, 2, 3);
+const N = M(4, 5, 6);
+
+M !== N;
+M.toString() === "[1, 2, 3]";
+N.toString() === "[1, 2, 3; 4, 5, 6]";
+```
+
+Once the matrix is built to your needs you can chain following methods.
+
+| Method       | Description                                  |
+| ------------ | -------------------------------------------- |
+| plus(b)      | adds `b` to all elements                     |
+| minus(b)     | subtracts `b` from all elements              |
+| times(b)     | multiplies `b` (scalar) to all elements      |
+| times(b)     | multiplies `b` (matrix) dot product          |
+| dividedBy(b) | divides all elements by `b` (scalar)         |
+| dividedBy(b) | equivalent to `.times(b.inverse())` (matrix) |
+| inverse()    | if possible returns the inverse matrix       |
+| eq(b)        | equivalent to `minus(b).squared()` (scalar)  |
+
+```js
+const theta = Symbol("Θ");
+const x = Symbol("x");
+const y = Symbol("y");
+
+// 2D translate
+const translate = matrix(1, 0, x)(0, 1, y)(0, 0, 1);
+
+// 2D rotation
+const rotate = matrix(cos(theta), sin(theta).times(-1), 0)(
+  sin(theta),
+  cos(theta),
+  0
+)(0, 0, 1);
+
+// take the inverse of the translation to get the shape to the origin
+// https://en.wikipedia.org/wiki/Matrix_similarity
+
+// 2D rotation around arbitrary point
+// 1) move to origin
+// 2) rotate around origin
+// 3) move back
+const output = translate.times(rotate).dividedBy(translate);
+
+// output =
+//   [cos(Θ), -sin(Θ),  x*cos(Θ) - y*sin(Θ) + x;
+//    sin(Θ),  cos(Θ), -x*sin(Θ) - y*cos(Θ) + y;
+//         0,       0,                        1]
 ```
 
 ## Contributing

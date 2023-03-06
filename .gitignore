@@ -3,5 +3,4 @@ dist
 coverage
 *.d.ts
 lib
-2d-algebra-v*.tgz
-.nyc_output
+2d-algebra-*.tgz

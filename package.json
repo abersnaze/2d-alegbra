@@ -1,0 +1,33 @@
+{
+  "name": "2d-algebra",
+  "type": "module",
+  "version": "4.0.0",
+  "description": "Library for building expressions and computing derivatives",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abersnaze/2d-algebra.git"
+  },
+  "keywords": [
+    "math",
+    "algebra",
+    "expression",
+    "derivative"
+  ],
+  "author": "George Campbell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abersnaze/2d-algebra/issues"
+  },
+  "homepage": "https://github.com/abersnaze/2d-algebra#readme",
+  "dependencies": {
+    "callable-instance": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "vitest": "^0.29.2"
+  }
+}
