@@ -1,57 +1,55 @@
 import { Identifier, INode } from "../interface"
 import { Add } from "./Add"
-import { Const, value } from "./Const"
+import { Const, NEG_ONE, ONE, value, ZERO } from "./Const"
+import { error } from "./Error"
 import { pow } from "./Pow"
 
-export function mult(...prods: INode[]): INode {
+export function mult(...factors: INode[]): INode {
   const flat = []
-  let accum = 1
-  for (const prod of prods) {
-    if (prod instanceof Const) {
-      accum *= prod.value
-    } else if (prod instanceof Mult) {
-      accum *= prod.value
-      prod.prods.forEach(p => flat.push(p))
+  let values = []
+  for (const factor of factors) {
+    if (factor instanceof Const) {
+      values.push(factor.value)
+    } else if (factor instanceof Mult) {
+      values.push(factor.value)
+      flat.push(...factor.factors)
     } else {
-      flat.push(prod)
+      flat.push(factor)
     }
   }
-  if (accum === 0) {
-    return value(0)
+  if (values.some(v => v === 0)) {
+    if (values.some(v => v === Infinity || v === -Infinity)) {
+      return error("indeterminate", new Mult(1, [...values.map(value), ...flat]))
+    }
+    return ZERO
   }
+  const v = values.reduce((a, b) => a * b, 1)
   if (flat.length === 0) {
-    return value(accum)
+    return value(v)
   }
-  if (accum === 1 && flat.length === 1) {
+  if (v === 1 && flat.length === 1) {
     return flat[0]
   }
-  return new Mult(accum, flat)
+  return new Mult(v, flat)
 }
 
 export function div(a: INode, b: INode): INode {
-  if (a === value(0))
-    return value(0)
-  if (b === value(1))
+  if (a === ZERO)
+    return ZERO
+  if (b === ONE)
     return a
-  return mult(a, pow(b, value(-1)))
+  return mult(a, pow(b, NEG_ONE))
 }
 
 
 class Mult implements INode {
-  constructor(readonly value: number, readonly prods: INode[]) {
-    if (prods === null) {
-      throw new Error("wtf")
-    }
-    if (!prods.every(p => p !== undefined)) {
-      throw new Error("wtf")
-    }
-  }
+  constructor(readonly value: number, readonly factors: INode[]) { }
 
   apply(subs: Map<Identifier, INode>): INode {
     let changed = false
-    const prods = this.prods.map(prod => {
-      const t = prod.apply(subs)
-      if (t !== prod) {
+    const factors = this.factors.map(f => {
+      const t = f.apply(subs)
+      if (t !== f) {
         changed = true
       }
       return t
@@ -59,31 +57,31 @@ class Mult implements INode {
     if (!changed)
       return this
     if (this.value !== 0) {
-      prods.push(value(this.value))
+      factors.push(value(this.value))
     }
-    return mult(...prods)
+    return mult(...factors)
   }
 
   derivative(withRespectTo: Identifier): INode {
-    return mult(...this.prods.map(prod => prod.derivative(withRespectTo)))
+    return mult(...this.factors.map(f => f.derivative(withRespectTo)))
   }
 
   print(): string {
-    const prods = this.prods.map(t => {
-      if (t instanceof Add) {
-        return "(" + t.print() + ")"
+    const factors = this.factors.map(f => {
+      if (f instanceof Add) {
+        return "(" + f.print() + ")"
       }
-      return t.print()
+      return f.print()
     })
     let value = this.value
     let prefix = ""
-    if (this.value < 0) {
+    if (value < 0) {
       value = -value
       prefix = "-"
     }
     if (value !== 1)
-      prods.push(this.value.toString())
-    return prefix + prods.join("*")
+      factors.push(value.toString())
+    return prefix + factors.join("*")
   }
 }
 

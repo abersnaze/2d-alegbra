@@ -1,9 +1,12 @@
 import { Identifier, INode } from "../interface"
-import { Const, value } from "./Const"
-import { div, mult } from "./Mult"
+import { Const, MIN, NEG_MIN, NEG_ONE, value } from "./Const"
+import { mult } from "./Mult"
+import { pow } from "./Pow"
 
 export function abs(a: INode): INode {
   if (a instanceof Const) {
+    if (a === NEG_MIN || a === MIN)
+      return MIN
     return value(Math.abs(a.value))
   }
   if (a instanceof Abs) {
@@ -16,7 +19,7 @@ class Abs implements INode {
   constructor(readonly a: INode) { }
 
   derivative(withRespectTo: Identifier): INode {
-    return mult(this.a.derivative(withRespectTo), div(this.a, abs(this.a)))
+    return mult(this.a.derivative(withRespectTo), this.a, pow(abs(this.a), NEG_ONE))
   }
 
   apply(subs: Map<Identifier, INode>): INode {

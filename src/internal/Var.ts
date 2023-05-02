@@ -1,5 +1,5 @@
 import { Identifier, INode } from "../interface"
-import { value } from "./Const"
+import { ONE, value, ZERO } from "./Const"
 
 export function variable(id: Identifier): INode {
   return new Var(id)
@@ -24,7 +24,7 @@ export class Var implements INode {
   }
 
   derivative(withRespectTo: Identifier): INode {
-    return withRespectTo === this.id ? value(1) : value(0)
+    return withRespectTo === this.id ? ONE : ZERO
   }
 
   print(): string {

@@ -1,38 +1,47 @@
 import { Identifier, INode } from "../interface"
-import { Const, value } from "./Const"
+import { Const, MIN, NEG_MIN, NEG_ONE, value, ZERO } from "./Const"
+import { Error, error } from "./Error"
 import { mult } from "./Mult"
 
 export function add(...terms: INode[]): INode {
   const flat = []
-  let accum = 0
+  const values: Const[] = []
   for (const term of terms) {
     if (term instanceof Const) {
-      accum += term.value
+      values.push(term)
     } else if (term instanceof Add) {
-      accum += term.value
-      term.terms.forEach(t => flat.push(t))
+      terms.push(...term.terms)
     } else {
       flat.push(term)
     }
   }
-  if (flat.length === 0) {
-    return value(accum)
+  const sum = values.reduce((a: Const | Error, b) => {
+    if (a instanceof Error)
+      return a
+    if (a === ZERO)
+      return b
+    if (a === MIN)
+      if (b === NEG_MIN)
+        return error("indeterminate", new Add([a, b]));
+    if (b === ZERO || b === MIN || b === NEG_MIN)
+      return a
+    return value(a.value + b.value)
+  }, ZERO)
+  if (sum !== ZERO && sum !== MIN && sum !== NEG_MIN) {
+    flat.push(sum)
   }
-  if (accum === 0 && flat.length === 1) {
+  if (flat.length === 1) {
     return flat[0]
   }
-  return new Add(accum, flat)
+  return new Add(flat)
 }
 
 export function sub(a: INode, b: INode): INode {
-  return add(a, mult(value(-1), b))
+  return add(a, mult(NEG_ONE, b))
 }
 
 export class Add implements INode {
-  constructor(readonly value: number, readonly terms: INode[]) {
-    if (terms === undefined)
-      throw new Error()
-  }
+  constructor(readonly terms: INode[]) { }
 
   apply(subs: Map<Identifier, INode>): INode {
     let changed = false
@@ -45,9 +54,6 @@ export class Add implements INode {
     })
     if (!changed)
       return this
-    if (this.value !== 0) {
-      terms.push(value(this.value))
-    }
     return add(...terms)
   }
 
@@ -57,8 +63,7 @@ export class Add implements INode {
 
   print(): string {
     const terms = this.terms.map(t => t.print())
-    if (this.value !== 0)
-      terms.push(this.value.toString())
+    terms.sort()
     return terms.join(" + ")
   }
 }

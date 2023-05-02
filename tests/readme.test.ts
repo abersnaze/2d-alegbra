@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest'
 import { cos, expression, matrix, minus, sin } from "../src"
 
+/*
+ * make sure README.md documentations is functional.
+ */
+
 test('line derivatives', () => {
   const m = 3 // slope
   const b = 4 // point

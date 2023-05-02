@@ -1,7 +1,7 @@
 import { Assignments, Identifier, IExpression, INode, IStack, Substitutions, Term } from "../interface"
 import { abs as _abs } from "./Abs"
 import { add, sub } from "./Add"
-import { Const, value } from "./Const"
+import { Const, TWO, value } from "./Const"
 import { log } from "./Log"
 import { div, mult } from "./Mult"
 import { pow } from "./Pow"
@@ -46,7 +46,7 @@ export class Expression implements IExpression {
   }
 
   squared(): IExpression {
-    return new Expression(pow(this.n, value(2)))
+    return new Expression(pow(this.n, TWO))
   }
 
   public abs(): IExpression
@@ -149,7 +149,7 @@ function apply(op: (a: INode, b: INode) => INode, exp: Expression) {
 }
 
 export function eq(a: INode, b: INode): INode {
-  return pow(sub(a, b), value(2))
+  return pow(sub(a, b), TWO)
 }
 
 export const I = Symbol("𝑖")

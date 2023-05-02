@@ -1,14 +1,34 @@
 import { Identifier, INode } from "../interface"
 import { sub } from "./Add"
-import { Const, value } from "./Const"
+import { Const, INF, MIN, NEG_INF, NEG_MIN, ONE, value, ZERO } from "./Const"
+import { error } from "./Error"
 import { mult } from "./Mult"
 import { Var } from "./Var"
 
 export function pow(a: INode, b: INode): INode {
-  if (b === value(0)) {
-    return value(1)
+  if (b instanceof Const) {
+    if (b.value < 0) {
+      if (a === ZERO) {
+        return error('divide by zero', new Pow(a, b))
+      }
+      if (a === INF) {
+        return MIN
+      }
+      if (a === NEG_INF) {
+        return NEG_MIN
+      }
+    }
   }
-  if (b === value(1)) {
+  if (a === ZERO && b === ZERO) {
+    return error('indeterminate', new Pow(a, b))
+  }
+  if (b === ZERO) {
+    if (a === value(Infinity) || a === value(-Infinity)) {
+      return error('indeterminate', new Pow(a, b))
+    }
+    return ONE
+  }
+  if (b === ONE) {
     return a
   }
   if (a instanceof Pow) {
@@ -33,8 +53,8 @@ class Pow implements INode {
 
   derivative(withRespectTo: Identifier): INode {
     const da = this.a.derivative(withRespectTo)
-    const x = pow(this.a, sub(this.b, value(1)))
-    const out = mult(mult(this.b, x), da)
+    const x = pow(this.a, sub(this.b, ONE))
+    const out = mult(this.b, x, da)
     return out
   }
 

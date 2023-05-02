@@ -1,5 +1,5 @@
 import { Identifier, INode } from "../interface"
-import { Const, value } from "./Const"
+import { Const, NEG_ONE, value } from "./Const"
 import { div, mult } from "./Mult"
 
 export function sin(a: INode) {
@@ -17,9 +17,6 @@ export function cos(a: INode) {
 }
 
 export function tan(a: INode) {
-  if (a instanceof Const) {
-    return value(Math.tan(a.value))
-  }
   return div(sin(a), cos(a))
 }
 
@@ -53,7 +50,7 @@ export class Cosine implements INode {
   }
 
   public derivative(withRespectTo: Identifier): INode {
-    return mult(value(-1), mult(sin(this.a), this.a.derivative(withRespectTo)))
+    return mult(NEG_ONE, sin(this.a), this.a.derivative(withRespectTo))
   }
 
   public print(): string {

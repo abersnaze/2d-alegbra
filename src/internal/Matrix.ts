@@ -1,7 +1,8 @@
 import CallableInstance from "callable-instance"
 import { Assignments, IMatrix, INode, Substitutions, Term } from "../interface"
 import { add, sub } from "./Add"
-import { Const, value } from "./Const"
+import { Const, NEG_ONE, ONE, value, ZERO } from "./Const"
+import { error } from "./Error"
 import { eq, toNode } from "./Expression"
 import { div, mult } from "./Mult"
 import { pow } from "./Pow"
@@ -53,7 +54,7 @@ export class Matrix extends CallableInstance<[...Term[]], Matrix> implements IMa
     if (b instanceof Matrix) {
       return dotProducts(this, inverse(b))
     } else {
-      return scalarProduct(this, pow(toNode(b), value(-1)))
+      return scalarProduct(this, pow(toNode(b), NEG_ONE))
     }
   }
 
@@ -110,14 +111,14 @@ export function dotProducts(a: Matrix, b: Matrix) {
 
   for (let j = 0; j < aH; j++) {
     for (let i = 0; i < bW; i++) {
-      let cExp = value(0)
+      const terms = []
       for (let k = 0; k < bH; k++) {
         const aExp = a.exps[j * aW + k]
         const bExp = b.exps[k * bW + i]
         const tmp = mult(aExp, bExp)
-        cExp = add(cExp, tmp)
+        terms.push(tmp)
       }
-      cExps.push(cExp)
+      cExps.push(add(...terms))
     }
   }
 
@@ -134,32 +135,32 @@ export function inverse(m: Matrix): Matrix {
     if ((i + j) % 2 === 0) {
       out.push(det)
     } else {
-      out.push(mult(det, value(-1)))
+      out.push(mult(det, NEG_ONE))
     }
     if (++i === m.width) {
       i = 0
       j++
     }
   }
-  const one_over_det = div(value(1), determinant(m))
+  const one_over_det = pow(determinant(m), NEG_ONE)
   return new Matrix(m.width, out.map(exp => mult(one_over_det, exp)))
 }
 
 export function determinant(a: Matrix): INode {
   if (a.exps.length !== a.width * a.width) {
-    throw new Error(`can only take determinant of square matrices. given ${a.exps.length / a.width}x${a.width}`)
+    return error(`can only take determinant of square matrices. given ${a.exps.length / a.width}x${a.width}`)
   }
   if (a.exps.length === 1) return a.exps[0]
   const j = 0
-  let sum = value(0)
+  const terms = []
   for (let i = 0; i < a.width; i++) {
     let minor_det = determinant(minor(i, j, a))
     if ((i + j) % 2 === 1) {
-      minor_det = mult(minor_det, value(-1))
+      minor_det = mult(minor_det, NEG_ONE)
     }
-    sum = add(sum, mult(a.exps[i], minor_det))
+    terms.push(mult(a.exps[i], minor_det))
   }
-  return sum
+  return add(...terms)
 }
 
 export function minor(i: number, j: number, m: Matrix): Matrix {

@@ -5,7 +5,8 @@
   "description": "Library for building expressions and computing derivatives",
   "main": "src/index.ts",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest --coverage --"
   },
   "repository": {
     "type": "git",
