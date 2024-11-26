@@ -1,15 +1,16 @@
-import { Identifier, INode } from "../interface"
+import { Applications, Identifier, INode, Interval } from "../interface"
 import { Const, value } from "./Const"
+import { iadd } from "./Internval"
 import { mult } from "./Mult"
 
 export function add(...terms: INode[]): INode {
   const flat = []
-  let accum = 0
+  let accum = [0, 0] as Interval
   for (const term of terms) {
     if (term instanceof Const) {
-      accum += term.value
+      accum = iadd(accum, term.value)
     } else if (term instanceof Add) {
-      accum += term.value
+      accum = iadd(accum, term.value)
       term.terms.forEach(t => flat.push(t))
     } else {
       flat.push(term)
@@ -29,12 +30,12 @@ export function sub(a: INode, b: INode): INode {
 }
 
 export class Add implements INode {
-  constructor(readonly value: number, readonly terms: INode[]) {
+  constructor(readonly value: Interval, readonly terms: INode[]) {
     if (terms === undefined)
       throw new Error()
   }
 
-  apply(subs: Map<Identifier, INode>): INode {
+  apply(subs: Applications): INode {
     let changed = false
     const terms = this.terms.map(term => {
       const t = term.apply(subs)
@@ -55,8 +56,8 @@ export class Add implements INode {
     return add(...this.terms.map(term => term.derivative(withRespectTo)))
   }
 
-  print(): string {
-    const terms = this.terms.map(t => t.print())
+  toString(): string {
+    const terms = this.terms.map(t => t.toString())
     if (this.value !== 0)
       terms.push(this.value.toString())
     return terms.join(" + ")

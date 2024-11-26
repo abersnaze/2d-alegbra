@@ -10,10 +10,10 @@ test('line derivatives', () => {
 
   expect(line.toString()).toBe("(x*3 + -x1 + 4)^2")
 
-  const solution = new Map([
-    [x, 7483],
-    [y, 22453],
-  ])
+  const solution = {
+    [x]: 7483,
+    [y]: 22453,
+  }
 
   const err = line.eval(solution)
   expect(err).to.equal(0)

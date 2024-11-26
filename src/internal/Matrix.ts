@@ -1,8 +1,8 @@
 import CallableInstance from "callable-instance"
-import { Assignments, IMatrix, INode, Substitutions, Term } from "../interface"
+import { Applications, Assignments, IMatrix, INode, Substitutions, Term } from "../interface"
 import { add, sub } from "./Add"
 import { Const, value } from "./Const"
-import { eq, toNode } from "./Expression"
+import { eq, toNode, toNodes } from "./Expression"
 import { div, mult } from "./Mult"
 import { pow } from "./Pow"
 
@@ -64,7 +64,7 @@ export class Matrix extends CallableInstance<[...Term[]], Matrix> implements IMa
   toString(): string {
     let out = "["
     for (let k = 0, i = 0; k < this.exps.length; k++) {
-      out += this.exps[k].print()
+      out += this.exps[k].toString()
       if (k + 1 === this.exps.length) {
         break
       }
@@ -87,8 +87,7 @@ export class Matrix extends CallableInstance<[...Term[]], Matrix> implements IMa
   }
 
   apply(subs: Substitutions) {
-    const _subs = new Map(Array.from(subs, ([k, v]) => [k, toNode(v)]))
-    return new Matrix(this.width, this.exps.map(e => e.apply(_subs)))
+    return new Matrix(this.width, this.exps.map(e => e.apply(toNodes(subs))))
   }
 }
 

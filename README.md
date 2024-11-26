@@ -1,29 +1,34 @@
 # 2D Algebra Typescript Module
 
-A library for programatically building up large systems of equations for numerical analysis.
-
 [![NPM Version][npm-image]][npm-url]
 [![Downloads Stats][npm-downloads]][npm-url]
+
+A library for programatically building up systems of equations for numerical analysis.  Feature that make this different:
+
+* It uses Symbol objects to represent variables and can be evaluated with a dictionary of values. This prevents string collisions and allows for more complex expressions.
+* It also supports taking the derivative of the expression with respect to a symbol.
+* The library also supports matrices of expressions and can be used to build up systems of equations for linear algebra.
+* The library is written in typescript and has no external dependencies.
 
 ## Technologies
 
 Project is created with:
 
-- Typescript version: 3.6.2
-- Node version: 12.10.0
-- No external dependencies
+* Typescript version: 3.6.2
+* Node version: 12.10.0
+* No external dependencies
 
 ## Setup
 
 To use this library
 
-`npm install 2d-algebra`
-`yarn add 2d-algebra`
+`npm install @abersnaze/algebra`
+`yarn add @abersnaze/algebra`
 
 Then in your code you can import and use the `expression(...)` function to fluently build expressions.
 
 ```js
-import expression from "2d-algebra";
+import expression from "@abersnaze/algebra";
 
 const m = 3; // slope
 const b = 4; // point
@@ -31,10 +36,10 @@ const x = Symbol("x");
 const y = Symbol(); // naming your symbols is optional
 const line = expression(m).times(x).plus(b).eq(y);
 
-const solution = new Map([
-  [x, 7483],
-  [y, 22453],
-]);
+const solution = {
+  [x]: 7483,
+  [y]: 22453,
+};
 
 const err = line.eval(solution);
 // err === 0
@@ -66,8 +71,8 @@ const xySaddle = hessianDet.eval(solution);
 
 Creating a new `Expression` is a easy as starting it off with the first `symbol` or `number`.
 
-```
-const one = expression(1).eval(new Map())
+```js
+const one = expression(1).eval({})
 ```
 
 From there you can use the following methods to additional complexity. All methods do not change the existing Expression but return a new Expression (AKA immutable). The `b` argument must be either a `symbol`, `number`, `Expression` or `Matrix`.
@@ -90,8 +95,8 @@ Once the expression is complete you can use the following methods
 
 | Method                    | Description                                                                         |
 | ------------------------- | ----------------------------------------------------------------------------------- |
-| eval(Map<symbol, number>) | fully evaluate the expression. throw error if not all of the symbols are defined.   |
-| apply(Map<symbol, Term>)  | substitute one or more variables with different term and return the new expression. |
+| eval({[key:symbol]: number}) | fully evaluate the expression. throw error if not all of the symbols are defined.   |
+| apply({[key:symbol]: Term})  | substitute one or more variables with different term and return the new expression. |
 | derivative(symbol)        | compute the partial derivative with respect to one symbol.                          |
 | toString()                | makes a ASCII art tree diagram of the expression tree.                              |
 
@@ -190,21 +195,20 @@ To submit changes to the project
 
 1. fork and clone the git repository
 2. make changes to the tests and source.
-   - If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
-   - Changes to simplification logic can be quite tricky with all the symbiotic recursion.
+   * If making changes to the `Expression` class make sure matching changes are made to `ExpressionStack`.
+   * Changes to simplification logic can be quite tricky with all the symbiotic recursion.
 3. run `yarn test`. if they fail goto step 2
 4. push changes to your fork
 5. submit pull request
 
 ### Other ussful commands
 
-- `yarn compile`: compile the typescript code to POJS
-- `yarn test`: run unit tests once.
-- `yarn watch`: continuously run unit tests.
+* `yarn compile`: compile the typescript code to POJS
+* `yarn test`: run unit tests once.
+* `yarn watch`: continuously run unit tests.
 
 <!-- Markdown link & img dfn's -->
 
 [npm-image]: https://img.shields.io/npm/v/2d-algebra.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/2d-algebra
 [npm-downloads]: https://img.shields.io/npm/dm/2d-algebra.svg?style=flat-square
-[wiki]: https://github.com/abersnaze/2d-algebra/wiki

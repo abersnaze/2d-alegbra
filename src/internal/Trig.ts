@@ -1,4 +1,4 @@
-import { Identifier, INode } from "../interface"
+import { Applications, Identifier, INode } from "../interface"
 import { Const, value } from "./Const"
 import { div, mult } from "./Mult"
 
@@ -26,7 +26,7 @@ export function tan(a: INode) {
 export class Sine implements INode {
   constructor(readonly a: INode) { }
 
-  apply(subs: Map<Identifier, INode>): INode {
+  apply(subs: Applications): INode {
     const _a = this.a.apply(subs)
     if (_a === this.a)
       return this
@@ -37,15 +37,15 @@ export class Sine implements INode {
     return mult(cos(this.a), this.a.derivative(withRespectTo))
   }
 
-  public print(): string {
-    return "sin(" + this.a.print() + ")"
+  public toString(): string {
+    return "sin(" + this.a.toString() + ")"
   }
 }
 
 export class Cosine implements INode {
   constructor(readonly a: INode) { }
 
-  apply(subs: Map<Identifier, INode>): INode {
+  apply(subs: Applications): INode {
     const _a = this.a.apply(subs)
     if (_a === this.a)
       return this
@@ -56,7 +56,7 @@ export class Cosine implements INode {
     return mult(value(-1), mult(sin(this.a), this.a.derivative(withRespectTo)))
   }
 
-  public print(): string {
-    return "cos(" + this.a.print() + ")"
+  public toString(): string {
+    return "cos(" + this.a.toString() + ")"
   }
 }

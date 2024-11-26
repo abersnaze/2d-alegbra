@@ -1,7 +1,9 @@
 export type Identifier = symbol | string
-export type Term = number | Identifier | IExpression
-export type Assignments = Map<Identifier, number>
-export type Substitutions = Map<Identifier, Term>
+export type Interval = [number, number]
+export type Term = number | Interval | Identifier | IExpression
+export type Assignments = { [key: Identifier]: number }
+export type Substitutions = { [key: Identifier]: Term }
+export type Applications = { [key: Identifier]: INode }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface IExpressionStack<N extends IExpressionStack<any> | IExpression> {
@@ -48,7 +50,7 @@ export interface IExpression {
   push(b: Term): IExpressionStack<IExpression>
   toString(): string
   derivative(withRespectTo: Identifier): IExpression
-  eval(subs: Assignments): number
+  eval(subs: Assignments): Interval
   apply(subs: Substitutions): IExpression
 }
 
@@ -63,12 +65,11 @@ export interface IMatrix {
   dividedBy(b: IMatrix): IMatrix
   eq(b: IMatrix): IMatrix
   toString(): string
-  eval(subs: Assignments): number[][]
+  eval(subs: Assignments): Interval[][]
   apply(subs: Substitutions): IMatrix
 }
-
 export interface INode {
-  apply(subs: Map<Identifier, INode>): INode
+  apply(subs: Applications): INode
   derivative(withRespectTo: Identifier): INode
-  print(): string
+  toString(): string
 }

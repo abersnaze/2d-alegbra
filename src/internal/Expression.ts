@@ -1,4 +1,4 @@
-import { Assignments, Identifier, IExpression, IExpressionStack, INode, Substitutions, Term } from "../interface"
+import { Applications, Assignments, Identifier, IExpression, IExpressionStack, INode, Substitutions, Term } from "../interface"
 import { abs as _abs } from "./Abs"
 import { add, sub } from "./Add"
 import { Const, value } from "./Const"
@@ -100,12 +100,12 @@ export class Expression implements IExpression {
     if (result.n instanceof Const) {
       return result.n.value
     }
-    throw new Error()
+    throw new Error("result wasn't a constant: " + result.n.toString())
   }
 
   apply(subs: Substitutions) {
-    const _subs = new Map(Array.from(subs, ([k, v]) => [k, toNode(v)]))
-    const result = this.n.apply(_subs)
+    const result = this.n.apply(toNodes(subs));
+
     if (result === this.n)
       return this
     return new Expression(result)
@@ -116,8 +116,17 @@ export class Expression implements IExpression {
   }
 
   toString(): string {
-    return this.simplify().n.print()
+    return this.simplify().n.toString()
   }
+}
+
+export function toNodes(subs: Substitutions): Applications {
+  // convert all the terms to nodes
+  const r = {} as Applications
+  for (const key of [...Object.keys(subs), ...Object.getOwnPropertySymbols(subs)]) {
+    r[key as string | symbol] = toNode(subs[key])
+  }
+  return r
 }
 
 export function toNode(x: Term): INode {

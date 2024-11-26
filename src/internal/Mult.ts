@@ -1,4 +1,4 @@
-import { Identifier, INode } from "../interface"
+import { Applications, Identifier, INode } from "../interface"
 import { Add } from "./Add"
 import { Const, value } from "./Const"
 import { pow } from "./Pow"
@@ -47,7 +47,7 @@ class Mult implements INode {
     }
   }
 
-  apply(subs: Map<Identifier, INode>): INode {
+  apply(subs: Applications): INode {
     let changed = false
     const prods = this.prods.map(prod => {
       const t = prod.apply(subs)
@@ -68,12 +68,12 @@ class Mult implements INode {
     return mult(...this.prods.map(prod => prod.derivative(withRespectTo)))
   }
 
-  print(): string {
+  toString(): string {
     const prods = this.prods.map(t => {
       if (t instanceof Add) {
-        return "(" + t.print() + ")"
+        return "(" + t.toString() + ")"
       }
-      return t.print()
+      return t.toString()
     })
     let value = this.value
     let prefix = ""

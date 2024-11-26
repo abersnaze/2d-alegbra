@@ -117,7 +117,7 @@ export class Stack<N extends IStack<any> | IExpression> implements IStack<N> {
 
   public toString() {
     const pStr = this.parent.toString()
-    const bStr = this.n.print()
+    const bStr = this.n.toString()
     return pStr + " | " + bStr
   }
 }

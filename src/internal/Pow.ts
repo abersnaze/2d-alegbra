@@ -1,4 +1,4 @@
-import { Identifier, INode } from "../interface"
+import { Applications, Identifier, INode } from "../interface"
 import { sub } from "./Add"
 import { Const, value } from "./Const"
 import { mult } from "./Mult"
@@ -23,7 +23,7 @@ export function pow(a: INode, b: INode): INode {
 class Pow implements INode {
   constructor(readonly a: INode, readonly b: INode) { }
 
-  apply(subs: Map<Identifier, INode>): INode {
+  apply(subs: Applications): INode {
     const a = this.a.apply(subs)
     const b = this.b.apply(subs)
     if (a === this.a && b === this.b)
@@ -38,12 +38,12 @@ class Pow implements INode {
     return out
   }
 
-  print(): string {
-    let b = this.b.print()
+  toString(): string {
+    let b = this.b.toString()
     if (!(this.b instanceof Const)) {
       b = "(" + b + ")"
     }
-    let a = this.a.print()
+    let a = this.a.toString()
     if (!(this.a instanceof Const || this.a instanceof Var)) {
       a = "(" + a + ")"
     }
